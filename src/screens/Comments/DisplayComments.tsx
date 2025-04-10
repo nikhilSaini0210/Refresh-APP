@@ -12,11 +12,24 @@ const DisplayComments: FC<Props> = ({comment}) => {
   return (
     <View style={styles.commentContainer}>
       <View style={styles.content}>
-        <Image
-          style={styles.image}
-          source={require('@assets/images/user.png')}
-        />
+        {comment?.profileUri ? (
+          <Image style={styles.image} source={{uri: comment?.profileUri}} />
+        ) : (
+          <Image
+            style={styles.image}
+            source={require('@assets/images/user.png')}
+          />
+        )}
+
+        <CustomText
+          numberOfLine={1}
+          fontFamily={Fonts.Regular}
+          variant="h5"
+          style={styles.textStyle}>
+          {comment?.userName}
+        </CustomText>
       </View>
+
       <View style={styles.commetSection}>
         <CustomText fontFamily={Fonts.Regular} variant="h5">
           {comment.comment}
@@ -44,11 +57,15 @@ const styles = StyleSheet.create({
   image: {
     width: 40,
     height: 40,
+    borderRadius: 50,
   },
   commetSection: {
     width: '100%',
     paddingBottom: 15,
     paddingHorizontal: 15,
     paddingLeft: 35,
+  },
+  textStyle: {
+    paddingHorizontal: 10,
   },
 });

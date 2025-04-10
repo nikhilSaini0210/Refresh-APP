@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useCallback, useState} from 'react';
 import postService, {Like, Post} from '@service/post.service';
 import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
 import CustomText from '@components/ui/CustomText';
@@ -16,6 +16,7 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import {useAuth} from '@state/useAuth';
 import {navigate} from '@utils/NavigationUtils';
 import {ROUTES} from '@navigation/Routes';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Home: FC = () => {
   const [loading, setLoading] = useState(false);
@@ -66,9 +67,11 @@ const Home: FC = () => {
     navigate(ROUTES.COMMENTS, {postData: item});
   };
 
-  useEffect(() => {
-    getAllPosts();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getAllPosts();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>

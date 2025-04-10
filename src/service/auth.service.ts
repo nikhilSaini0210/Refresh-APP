@@ -2,9 +2,11 @@ import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {CollectionsType, GOOGLE_WEB_CLIENT_ID, USER_DATA_KEY} from './config';
-import firestore from '@react-native-firebase/firestore';
-import {ROUTES} from '@navigation/Routes';
-import {resetAndNavigate} from '@utils/NavigationUtils';
+import firestore, {
+  doc,
+  getDoc,
+  getFirestore,
+} from '@react-native-firebase/firestore';
 import {LoginManager, AccessToken} from 'react-native-fbsdk-next';
 import messaging from '@react-native-firebase/messaging';
 import {Platform} from 'react-native';
@@ -33,6 +35,7 @@ interface TokenData {
 }
 
 class AuthService {
+  private db = getFirestore();
   // Request notification permissions and get FCM token
   private async requestNotificationPermission(): Promise<string | null> {
     try {
@@ -108,7 +111,11 @@ class AuthService {
             providerId: 'google.com',
             fcmToken: fcmToken || undefined,
           };
-          await this.storeUserData(userData);
+          if (userData.id) {
+            await this.storeUserData(userData as UserData);
+          } else {
+            throw new Error('User ID is undefined');
+          }
 
           return userData;
         }
@@ -203,7 +210,7 @@ class AuthService {
               fcmToken: fcmToken || undefined,
             };
 
-            await this.storeUserData(userData);
+            await this.storeUserData(userData as UserData);
 
             return userData;
           }
@@ -348,7 +355,6 @@ class AuthService {
   async updateUserDataInFirestore(
     userId: string,
     userData: Partial<UserData>,
-    routeName: ROUTES,
     collectionType: CollectionsType,
   ): Promise<void> {
     try {
@@ -362,11 +368,7 @@ class AuthService {
 
       if (collectionType === CollectionsType.Users) {
         await AsyncStorage.removeItem(USER_DATA_KEY);
-        await this.storeUserData(userData);
-      }
-
-      if (routeName) {
-        resetAndNavigate(routeName);
+        await this.storeUserData(userData as UserData);
       }
     } catch (error) {
       console.error('Error updating user data in Firestore:', error);
@@ -440,12 +442,28 @@ class AuthService {
         .get();
 
       const batch = firestore().batch();
-      snapshot.docs.forEach(doc => {
-        batch.delete(doc.ref);
+      snapshot.docs.forEach(document => {
+        batch.delete(document.ref);
       });
       await batch.commit();
     } catch (error) {
       console.error('Error deleting FCM token:', error);
+      throw error;
+    }
+  }
+
+  // Get user data by user ID
+  async getUserById(userId: string): Promise<UserData | null> {
+    try {
+      const userRef = doc(this.db, CollectionsType.Users, userId);
+      const userDoc = await getDoc(userRef);
+
+      if (userDoc.exists) {
+        return userDoc.data() as UserData;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting user data by ID:', error);
       throw error;
     }
   }

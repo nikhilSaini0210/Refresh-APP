@@ -46,9 +46,9 @@ const OnBoardingA = () => {
             await authService.updateUserDataInFirestore(
               user.id,
               userData,
-              ROUTES.HOME,
               CollectionsType.Users,
             );
+             resetAndNavigate(ROUTES.HOME);
           }
         } else {
           await authService.storeUserDataInFirestore(
@@ -100,9 +100,9 @@ const OnBoardingA = () => {
             await authService.updateUserDataInFirestore(
               user.id,
               userData,
-              ROUTES.HOME,
               CollectionsType.Users,
             );
+             resetAndNavigate(ROUTES.HOME);
             console.log('Device token already registered in firebase store.');
           } else {
             const userData = {
@@ -113,9 +113,9 @@ const OnBoardingA = () => {
             await authService.updateUserDataInFirestore(
               user.id,
               userData,
-              ROUTES.HOME,
               CollectionsType.Users,
             );
+             resetAndNavigate(ROUTES.HOME);
           }
         } else {
           await authService.storeUserDataInFirestore(

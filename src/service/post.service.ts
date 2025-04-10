@@ -25,6 +25,9 @@ export interface Comment {
   comment: string;
   commentId: string;
   timestamp: string;
+  userName: string;
+  profileUri: string;
+  postId: string;
 }
 
 export interface Post {
@@ -179,6 +182,24 @@ class PostService {
       });
     } catch (error) {
       console.error('Error adding comment:', error);
+      throw error;
+    }
+  }
+
+  async getCommentsByPostId(postId: string): Promise<Comment[]> {
+    try {
+      const postsRef = collection(this.db, CollectionsType.Posts);
+      const postRef = doc(postsRef, postId);
+
+      const postDoc = await getDoc(postRef);
+      if (!postDoc.exists) {
+        throw new Error('Post not found');
+      }
+
+      const postData = postDoc.data() as Post;
+      return postData.comments || [];
+    } catch (error) {
+      console.error('Error getting comments for post:', error);
       throw error;
     }
   }

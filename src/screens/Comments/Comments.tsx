@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import 'firebase/firestore';
 import {useRoute} from '@react-navigation/native';
 import postService, {Comment, Post} from '@service/post.service';
@@ -19,6 +19,7 @@ import CustomKeyboardDismiss from '@components/global/CustomKeyboardDismiss';
 import {useAuth} from '@state/useAuth';
 import {v4 as uuidv4} from 'uuid';
 import DisplayComments from './DisplayComments';
+import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
 
 const Comments = () => {
   const route = useRoute();
@@ -26,12 +27,16 @@ const Comments = () => {
   const postData = params?.postData;
   const [comment, setComment] = useState('');
   const {user} = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [commentList, setCommentList] = useState<Comment[]>([]);
 
   const postComment = async () => {
     Keyboard.dismiss();
+
     if (comment.trim() === '') {
       return;
     }
+    setLoading(true);
     if (user && postData) {
       const uid = uuidv4();
       const newComment: Comment = {
@@ -39,18 +44,41 @@ const Comments = () => {
         comment: comment,
         userId: user.id,
         timestamp: Date.now().toString(),
+        userName: user?.displayName,
+        profileUri: user?.photoURL,
+        postId: postData?.id,
       };
-
+      setComment('');
       try {
         await postService.addComment(postData.id, newComment);
-        setComment('');
+        await fetchComments(postData.id);
       } catch (error) {
         Alert.alert('Error', 'Failed to post comment.');
+      } finally {
+        setLoading(false);
       }
     } else {
+      setLoading(false);
       Alert.alert('Login', 'Please login to post a comment.');
     }
   };
+
+  const fetchComments = async (postId: string) => {
+    try {
+      const comments = await postService.getCommentsByPostId(postId);
+      if (comments) {
+        setCommentList(comments);
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (postData?.comments) {
+      setCommentList(postData?.comments);
+    }
+  }, [postData]);
 
   return (
     <CustomSafeAreaView>
@@ -58,7 +86,7 @@ const Comments = () => {
         <View style={styles.container}>
           <CustomHeader title="Comments" />
           <FlatList
-            data={postData?.comments || []}
+            data={commentList}
             keyExtractor={item => item.commentId}
             renderItem={({item}) => <DisplayComments comment={item} />}
           />
@@ -80,6 +108,7 @@ const Comments = () => {
               />
             </TouchableOpacity>
           </View>
+          <ActivityLoaderModal visible={loading} />
         </View>
       </CustomKeyboardDismiss>
     </CustomSafeAreaView>

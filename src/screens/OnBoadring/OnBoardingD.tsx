@@ -13,6 +13,7 @@ import {ROUTES} from '@navigation/Routes';
 import {useAuth} from '@state/useAuth';
 import authService from '@service/auth.service';
 import {CollectionsType} from '@service/config';
+import {resetAndNavigate} from '@utils/NavigationUtils';
 
 interface RouteParams {
   userData: {
@@ -53,9 +54,9 @@ const OnBoardingD: FC = () => {
         await authService.updateUserDataInFirestore(
           user.id,
           userDate,
-          ROUTES.HOME,
           CollectionsType.Users,
         );
+        resetAndNavigate(ROUTES.HOME);
       } else {
         Alert.alert('User is not logged in.');
         setLoading(false);
