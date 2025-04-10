@@ -1,15 +1,26 @@
-import {FlatList, Image, StyleSheet, View} from 'react-native';
+import {
+  Alert,
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {FC, useEffect, useState} from 'react';
-import postService, {Post} from '@service/post.service';
+import postService, {Like, Post} from '@service/post.service';
 import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
 import CustomText from '@components/ui/CustomText';
 import {Fonts} from '@utils/Constants';
 import CustomHeader from '@components/ui/CustomHeader';
 import {RFValue} from 'react-native-responsive-fontsize';
+import {useAuth} from '@state/useAuth';
+import {navigate} from '@utils/NavigationUtils';
+import {ROUTES} from '@navigation/Routes';
 
 const Home: FC = () => {
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState<Post[] | []>([]);
+  const {user} = useAuth();
 
   const getAllPosts = async () => {
     setLoading(true);
@@ -21,6 +32,38 @@ const Home: FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onLike = async (item: Post) => {
+    let likes = [] as Like[];
+
+    if (user) {
+      const existingLike = item?.likes?.find(like => like?.userId === user.id);
+      if (existingLike) {
+        likes = (item?.likes || []).filter(like => like.userId !== user.id);
+      } else {
+        likes = [...(item?.likes || []), {userId: user.id}];
+      }
+      const updatedPost = {
+        ...item,
+        likes,
+      };
+      await postService.updatePost(item.id, updatedPost);
+      await getAllPosts();
+    } else {
+      // resetAndNavigate(ROUTES.ONBOARD_A);
+      Alert.alert('Login', 'Please login again.');
+    }
+  };
+
+  const checkLikeStatus = (item: Post) => {
+    if (user) {
+      return item.likes?.some(like => like.userId === user.id);
+    }
+  };
+
+  const onComment = (item: Post) => {
+    navigate(ROUTES.COMMENTS, {postData: item});
   };
 
   useEffect(() => {
@@ -58,6 +101,41 @@ const Home: FC = () => {
               {item?.caption}
             </CustomText>
             <Image source={{uri: item.imageUrl}} style={styles.image} />
+            <View style={styles.lcContainer}>
+              <TouchableOpacity style={styles.btn} onPress={() => onLike(item)}>
+                <CustomText
+                  fontFamily={Fonts.Regular}
+                  variant="h4"
+                  style={styles.lcText}>
+                  {item?.likes?.length ?? 0}
+                </CustomText>
+                {checkLikeStatus(item) ? (
+                  <Image
+                    source={require('@assets/images/heartred.png')}
+                    style={[styles.lcIcon]}
+                  />
+                ) : (
+                  <Image
+                    source={require('@assets/images/heart.png')}
+                    style={styles.lcIcon}
+                  />
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.btn}
+                onPress={() => onComment(item)}>
+                <CustomText
+                  fontFamily={Fonts.Regular}
+                  variant="h4"
+                  style={styles.lcText}>
+                  {item.comments?.length ?? 0}
+                </CustomText>
+                <Image
+                  source={require('@assets/images/comment.png')}
+                  style={styles.lcIcon}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         )}
         ListEmptyComponent={
@@ -120,7 +198,26 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   caption: {
-   marginHorizontal: 20,
-   marginVertical: 10,
+    marginHorizontal: 20,
+    marginVertical: 10,
+  },
+  lcContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    width: '100%',
+    height: 50,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  btn: {
+    flexDirection: 'row',
+  },
+  lcIcon: {
+    width: 24,
+    height: 24,
+  },
+  lcText: {
+    marginRight: 5,
+    textAlign: 'center',
   },
 });

@@ -21,12 +21,14 @@ const CustomHeader: FC<Props> = ({
   return (
     <SafeAreaView>
       <View style={styles.flexRow}>
-        <CustomText
-          style={[styles.text, {color: titleColor}]}
-          variant="h5"
-          fontFamily={Fonts.SemiBold}>
-          {title}
-        </CustomText>
+        <View>
+          <CustomText
+            style={[styles.text, {color: titleColor}]}
+            variant="h5"
+            fontFamily={Fonts.SemiBold}>
+            {title}
+          </CustomText>
+        </View>
         <View>
           {secondTitle && (
             <Pressable onPress={onPress}>

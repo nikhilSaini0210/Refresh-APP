@@ -16,6 +16,17 @@ import {uploadToS3} from './uploadToS3';
 import {CollectionsType} from './config';
 import {Asset} from 'react-native-image-picker';
 
+export interface Like {
+  userId: string;
+}
+
+export interface Comment {
+  userId: string;
+  comment: string;
+  commentId: string;
+  timestamp: string;
+}
+
 export interface Post {
   id: string;
   imageUrl: string;
@@ -25,6 +36,8 @@ export interface Post {
   userId: string;
   createdAt: any;
   updatedAt: any;
+  likes?: Like[];
+  comments?: Comment[];
 }
 
 class PostService {
@@ -142,6 +155,30 @@ class PostService {
       await deleteDoc(postRef);
     } catch (error) {
       console.error('Error deleting post:', error);
+      throw error;
+    }
+  }
+
+  async addComment(postId: string, newComment: Comment): Promise<void> {
+    try {
+      const postsRef = collection(this.db, CollectionsType.Posts);
+      const postRef = doc(postsRef, postId);
+
+      const postDoc = await getDoc(postRef);
+      if (!postDoc.exists) {
+        throw new Error('Post not found');
+      }
+
+      const postData = postDoc.data() as Post;
+
+      const updatedComments = [...(postData.comments || []), newComment];
+
+      await updateDoc(postRef, {
+        comments: updatedComments,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error('Error adding comment:', error);
       throw error;
     }
   }

@@ -9,6 +9,7 @@ import OnBoardingB from '@screens/OnBoadring/OnBoardingB';
 import OnBoardingC from '@screens/OnBoadring/OnBoardingC';
 import OnBoardingD from '@screens/OnBoadring/OnBoardingD';
 import HomeScreen from '@screens/Home/HomeScreen';
+import Comments from '@screens/Comments/Comments';
 
 const Stack = createNativeStackNavigator();
 
@@ -136,10 +137,10 @@ const Navigation: FC = () => {
           name={ROUTES.HOME}
           component={HomeScreen}
         />
-        {/* <Stack.Screen
-          name={ROUTES.PRODUCTORDER}
-          component={ProductOrderWithStatusBar}
-        /> */}
+        <Stack.Screen
+          name={ROUTES.COMMENTS}
+          component={Comments}
+        />
         {/* <Stack.Screen
           name={ROUTES.ORDERSUCCESS}
           component={OrderSuccessWithStatusBar}

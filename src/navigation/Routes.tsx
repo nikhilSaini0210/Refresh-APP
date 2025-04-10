@@ -5,4 +5,5 @@ export enum ROUTES {
   ONBOARD_C = '/onboard_c',
   ONBOARD_D = '/onboard_d',
   HOME = '/home',
+  COMMENTS = '/comments',
 }
