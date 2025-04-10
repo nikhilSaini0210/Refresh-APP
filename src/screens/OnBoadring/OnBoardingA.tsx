@@ -32,10 +32,11 @@ const OnBoardingA = () => {
           if (
             result?.email === user?.email &&
             result?.providerId === user?.providerId &&
-            result?.fcmToken
+            result?.fcmToken === user?.fcmToken
           ) {
             await authService.storeUserData(result);
             resetAndNavigate(ROUTES.HOME);
+            console.log('Device token already registered in firebase store.');
           } else {
             const userData = {
               ...result,
@@ -89,8 +90,21 @@ const OnBoardingA = () => {
         if (result) {
           if (
             result?.email === user?.email &&
-            result?.providerId === user?.providerId
+            result?.providerId === user?.providerId &&
+            result?.fcmToken === user?.fcmToken
           ) {
+            const userData = {
+              ...result,
+              providerId: 'facebook.com',
+            };
+            await authService.updateUserDataInFirestore(
+              user.id,
+              userData,
+              ROUTES.HOME,
+              CollectionsType.Users,
+            );
+            console.log('Device token already registered in firebase store.');
+          } else {
             const userData = {
               ...result,
               providerId: 'facebook.com',

@@ -16,6 +16,7 @@ module.exports = {
           '@service': './src/service',
           '@state': './src/state',
           '@utils': './src/utils',
+          '@notification': './src/notification',
         },
       },
     ],
