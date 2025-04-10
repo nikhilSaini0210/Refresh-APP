@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "37585022096",
+    "project_id": "social-media-c0135",
+    "storage_bucket": "social-media-c0135.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37585022096:android:289e40b82c1c4f9c3d3c15",
+        "android_client_info": {
+          "package_name": "com.socailapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "37585022096-cnap3npj7nc3kenjo76kamp9ml2chhql.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.socailapp",
+            "certificate_hash": "f9eac2337c51a3cb09e872e1882d4ee1b074b757"
+          }
+        },
+        {
+          "client_id": "37585022096-halucdk8av5jdpl4a7oop33uq6nk7jpd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAea00mel3nTw0GfRtktZY-VsD3HpVH8-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "37585022096-halucdk8av5jdpl4a7oop33uq6nk7jpd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
