@@ -16,12 +16,14 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import {useAuth} from '@state/useAuth';
 import {navigate} from '@utils/NavigationUtils';
 import {ROUTES} from '@navigation/Routes';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
+import authService, {UserData} from '@service/auth.service';
 
 const Home: FC = () => {
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState<Post[] | []>([]);
   const {user} = useAuth();
+  const [postUserData, setPostUserData] = useState<UserData[]>([]);
 
   const getAllPosts = async () => {
     setLoading(true);
@@ -67,10 +69,20 @@ const Home: FC = () => {
     navigate(ROUTES.COMMENTS, {postData: item});
   };
 
+  const getPostUseerData = async () => {
+    try {
+      const users = await authService.getAllUsers();
+      setPostUserData(users);
+    } catch (error) {
+      console.log('Error fetching users:', error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       getAllPosts();
-    }, [])
+      getPostUseerData();
+    }, []),
   );
 
   return (
@@ -83,64 +95,78 @@ const Home: FC = () => {
         contentContainerStyle={
           posts.length === 0 ? styles.flatListContainer : styles.flistContent
         }
-        renderItem={({item}) => (
-          <View style={styles.imageContainer}>
-            <View style={styles.userContent}>
-              <Image
-                style={styles.userImage}
-                source={require('@assets/images/user.png')}
-              />
-              <CustomText
-                style={styles.userName}
-                fontFamily={Fonts.Medium}
-                fontSize={RFValue(14)}>
-                {item.userName}
-              </CustomText>
-            </View>
-            <CustomText
-              style={styles.caption}
-              fontFamily={Fonts.Medium}
-              fontSize={RFValue(14)}>
-              {item?.caption}
-            </CustomText>
-            <Image source={{uri: item.imageUrl}} style={styles.image} />
-            <View style={styles.lcContainer}>
-              <TouchableOpacity style={styles.btn} onPress={() => onLike(item)}>
-                <CustomText
-                  fontFamily={Fonts.Regular}
-                  variant="h4"
-                  style={styles.lcText}>
-                  {item?.likes?.length ?? 0}
-                </CustomText>
-                {checkLikeStatus(item) ? (
+        renderItem={({item}) => {
+          const postUser = postUserData?.find(u => u.id === item.userId);
+          return (
+            <View style={styles.imageContainer}>
+              <View style={styles.userContent}>
+                {postUser && postUser?.photoURL ? (
                   <Image
-                    source={require('@assets/images/heartred.png')}
-                    style={[styles.lcIcon]}
+                    style={styles.userImage}
+                    source={{uri: postUser?.photoURL}}
                   />
                 ) : (
                   <Image
-                    source={require('@assets/images/heart.png')}
-                    style={styles.lcIcon}
+                    style={styles.userImage}
+                    source={require('@assets/images/user.png')}
                   />
                 )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.btn}
-                onPress={() => onComment(item)}>
-                <CustomText
-                  fontFamily={Fonts.Regular}
-                  variant="h4"
-                  style={styles.lcText}>
-                  {item.comments?.length ?? 0}
-                </CustomText>
-                <Image
-                  source={require('@assets/images/comment.png')}
-                  style={styles.lcIcon}
-                />
-              </TouchableOpacity>
+                {postUser && postUser?.displayName && (
+                  <CustomText
+                    style={styles.userName}
+                    fontFamily={Fonts.Medium}
+                    fontSize={RFValue(14)}>
+                    {postUser?.displayName}
+                  </CustomText>
+                )}
+              </View>
+              <CustomText
+                style={styles.caption}
+                fontFamily={Fonts.Medium}
+                fontSize={RFValue(14)}>
+                {item?.caption}
+              </CustomText>
+              <Image source={{uri: item.imageUrl}} style={styles.image} />
+              <View style={styles.lcContainer}>
+                <TouchableOpacity
+                  style={styles.btn}
+                  onPress={() => onLike(item)}>
+                  <CustomText
+                    fontFamily={Fonts.Regular}
+                    variant="h4"
+                    style={styles.lcText}>
+                    {item?.likes?.length ?? 0}
+                  </CustomText>
+                  {checkLikeStatus(item) ? (
+                    <Image
+                      source={require('@assets/images/heartred.png')}
+                      style={[styles.lcIcon]}
+                    />
+                  ) : (
+                    <Image
+                      source={require('@assets/images/heart.png')}
+                      style={styles.lcIcon}
+                    />
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.btn}
+                  onPress={() => onComment(item)}>
+                  <CustomText
+                    fontFamily={Fonts.Regular}
+                    variant="h4"
+                    style={styles.lcText}>
+                    {item.comments?.length ?? 0}
+                  </CustomText>
+                  <Image
+                    source={require('@assets/images/comment.png')}
+                    style={styles.lcIcon}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
+          );
+        }}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <CustomText fontFamily={Fonts.SemiBold} variant="h7">
@@ -196,6 +222,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     marginLeft: 15,
+    borderRadius: 50,
   },
   userName: {
     marginLeft: 10,

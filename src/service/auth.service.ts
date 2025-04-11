@@ -3,9 +3,14 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {CollectionsType, GOOGLE_WEB_CLIENT_ID, USER_DATA_KEY} from './config';
 import firestore, {
+  arrayRemove,
+  arrayUnion,
+  collection,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
+  updateDoc,
 } from '@react-native-firebase/firestore';
 import {LoginManager, AccessToken} from 'react-native-fbsdk-next';
 import messaging from '@react-native-firebase/messaging';
@@ -24,6 +29,8 @@ export interface UserData {
   age?: string;
   gender?: string;
   fcmToken?: string;
+  following?: string[];
+  followers?: string[];
 }
 
 interface TokenData {
@@ -36,7 +43,8 @@ interface TokenData {
 
 class AuthService {
   private db = getFirestore();
-  // Request notification permissions and get FCM token
+
+
   private async requestNotificationPermission(): Promise<string | null> {
     try {
       const authStatus = await messaging().requestPermission();
@@ -55,7 +63,6 @@ class AuthService {
     }
   }
 
-  // Store FCM token in separate collection
   private async storeFCMToken(userId: string, token: string): Promise<void> {
     try {
       const tokenRef = firestore().collection(CollectionsType.Tokens).doc();
@@ -73,13 +80,10 @@ class AuthService {
     }
   }
 
-  // Google Sign In
   async signInWithGoogle(): Promise<UserData | null> {
     try {
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
-
       const signInResult = await GoogleSignin.signIn();
-
       let idToken = signInResult.data?.idToken;
 
       if (!idToken) {
@@ -169,7 +173,6 @@ class AuthService {
     }
   }
 
-  // Facebook Sign In
   async signInWithFacebook(): Promise<UserData | null> {
     try {
       try {
@@ -242,9 +245,6 @@ class AuthService {
           )
         ) {
           const googleUser = await this.signInWithGoogle();
-          console.log(
-            'Google sign-in successful from outer catch, returning user',
-          );
           return googleUser;
         }
 
@@ -257,12 +257,11 @@ class AuthService {
       throw error;
     }
   }
-  // Sign out
+
   async signOut(provider: 'facebook.com' | 'google.com'): Promise<void> {
     try {
       if (provider === 'facebook.com') {
         await LoginManager.logOut();
-        // await GoogleSignin.revokeAccess();
       } else {
         await GoogleSignin.revokeAccess();
         await GoogleSignin.signOut();
@@ -276,7 +275,6 @@ class AuthService {
     }
   }
 
-  // Store user data in AsyncStorage
   async storeUserData(userData: UserData): Promise<void> {
     try {
       await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
@@ -285,7 +283,6 @@ class AuthService {
     }
   }
 
-  // Get user data from AsyncStorage
   async getUserData(): Promise<UserData | null> {
     try {
       const jsonValue = await AsyncStorage.getItem(USER_DATA_KEY);
@@ -296,18 +293,15 @@ class AuthService {
     }
   }
 
-  // Check if user is authenticated
   async isAuthenticated(): Promise<boolean> {
     const userData = await this.getUserData();
     return userData !== null;
   }
 
-  // Get current authenticated user
   getCurrentUser() {
     return auth().currentUser;
   }
 
-  // Store user data in Firestore
   async storeUserDataInFirestore(
     userData: UserData,
     collectionType: CollectionsType,
@@ -328,7 +322,6 @@ class AuthService {
     }
   }
 
-  // Get user data from Firestore
   async getUserDataFromFirestore(
     userId: string,
     collectionType: CollectionsType,
@@ -351,7 +344,6 @@ class AuthService {
     }
   }
 
-  // Update user data in Firestore
   async updateUserDataInFirestore(
     userId: string,
     userData: Partial<UserData>,
@@ -376,7 +368,6 @@ class AuthService {
     }
   }
 
-  // Get sign-in methods for an email
   async getSignInMethodsForEmail(email: string): Promise<string[]> {
     try {
       return await auth().fetchSignInMethodsForEmail(email);
@@ -386,7 +377,6 @@ class AuthService {
     }
   }
 
-  // Update FCM token for a user
   async updateUserFCMTokenUser(userId: string): Promise<void> {
     try {
       const fcmToken = await this.requestNotificationPermission();
@@ -405,7 +395,6 @@ class AuthService {
     }
   }
 
-  // Update FCM token for a user
   async updateUserFCMTokens(userId: string): Promise<void> {
     try {
       const fcmToken = await this.requestNotificationPermission();
@@ -418,7 +407,6 @@ class AuthService {
     }
   }
 
-  // Get all FCM tokens for a user
   async getUserFCMTokens(userId: string): Promise<TokenData[]> {
     try {
       const snapshot = await firestore()
@@ -433,7 +421,6 @@ class AuthService {
     }
   }
 
-  // Delete FCM token
   async deleteFCMToken(token: string): Promise<void> {
     try {
       const snapshot = await firestore()
@@ -452,7 +439,6 @@ class AuthService {
     }
   }
 
-  // Get user data by user ID
   async getUserById(userId: string): Promise<UserData | null> {
     try {
       const userRef = doc(this.db, CollectionsType.Users, userId);
@@ -464,6 +450,89 @@ class AuthService {
       return null;
     } catch (error) {
       console.error('Error getting user data by ID:', error);
+      throw error;
+    }
+  }
+
+  async getAllUsers(): Promise<UserData[]> {
+    try {
+      const usersRef = collection(this.db, CollectionsType.Users);
+      const snapshot = await getDocs(usersRef);
+
+      return snapshot.docs.map(document => document.data() as UserData);
+    } catch (error) {
+      console.error('Error fetching all users:', error);
+      throw error;
+    }
+  }
+
+  async getAllUsersExceptCurrentUser(
+    currentUserId: string,
+  ): Promise<UserData[]> {
+    try {
+      const usersRef = collection(this.db, CollectionsType.Users);
+      const snapshot = await getDocs(usersRef);
+
+      return snapshot.docs
+        .map(document => document.data() as UserData)
+        .filter(user => user.id !== currentUserId);
+    } catch (error) {
+      console.error('Error fetching all users except current user:', error);
+      throw error;
+    }
+  }
+
+  async followUser(
+    currentUserId: string,
+    targetUserId: string,
+  ): Promise<UserData | void> {
+    try {
+      const currentUserRef = doc(this.db, CollectionsType.Users, currentUserId);
+      const targetUserRef = doc(this.db, CollectionsType.Users, targetUserId);
+
+      await updateDoc(currentUserRef, {
+        following: arrayUnion(targetUserId),
+      });
+
+      await updateDoc(targetUserRef, {
+        followers: arrayUnion(currentUserId),
+      });
+
+      const user = await this.getUserById(currentUserId);
+      if (user) {
+        await AsyncStorage.removeItem(USER_DATA_KEY);
+        await this.storeUserData(user);
+        return user;
+      }
+    } catch (error) {
+      console.error('Error following user:', error);
+      throw error;
+    }
+  }
+
+  async unfollowUser(
+    currentUserId: string,
+    targetUserId: string,
+  ): Promise<UserData | void> {
+    try {
+      const currentUserRef = doc(this.db, CollectionsType.Users, currentUserId);
+      const targetUserRef = doc(this.db, CollectionsType.Users, targetUserId);
+
+      await updateDoc(currentUserRef, {
+        following: arrayRemove(targetUserId),
+      });
+
+      await updateDoc(targetUserRef, {
+        followers: arrayRemove(currentUserId),
+      });
+      const user = await this.getUserById(currentUserId);
+      if (user) {
+        await AsyncStorage.removeItem(USER_DATA_KEY);
+        await this.storeUserData(user);
+        return user;
+      }
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
       throw error;
     }
   }

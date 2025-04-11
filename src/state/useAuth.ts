@@ -7,6 +7,7 @@ export const useAuth = () => {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUpdateUser, setIsUpdateUser] = useState(false);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -18,11 +19,12 @@ export const useAuth = () => {
         console.error(err);
       } finally {
         setLoading(false);
+        setIsUpdateUser(false);
       }
     };
 
     checkAuthStatus();
-  }, []);
+  }, [isUpdateUser]);
 
   const signInWithGoogle = async () => {
     setLoading(true);
@@ -104,6 +106,7 @@ export const useAuth = () => {
   return {
     user,
     loading,
+    setIsUpdateUser,
     error,
     signInWithGoogle,
     signInWithFacebook,

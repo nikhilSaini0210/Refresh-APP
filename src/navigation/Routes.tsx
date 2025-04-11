@@ -6,4 +6,6 @@ export enum ROUTES {
   ONBOARD_D = '/onboard_d',
   HOME = '/home',
   COMMENTS = '/comments',
+  FOLLOWERLIST = '/follwerlist',
+  NEWMESAAGES = '/new_messages',
 }

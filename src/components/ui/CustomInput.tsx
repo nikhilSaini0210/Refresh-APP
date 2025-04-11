@@ -10,7 +10,7 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import {Colors, Fonts} from '@utils/Constants';
 
 interface InputProps {
-  left: React.ReactNode;
+  left?: React.ReactNode;
   onClear?: () => void;
   right?: boolean;
 }
@@ -26,7 +26,7 @@ const CustomInput: FC<InputProps & React.ComponentProps<typeof TextInput>> = ({
       {left}
       <TextInput
         {...props}
-        style={styles.inputContainer}
+        style={[styles.inputContainer, props.style]}
         placeholderTextColor={Colors.text}
         cursorColor={'#000'}
       />

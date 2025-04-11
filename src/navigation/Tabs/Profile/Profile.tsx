@@ -1,5 +1,12 @@
-import {Alert, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {FC, useState} from 'react';
+import {
+  Alert,
+  Button,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, {FC, useCallback, useState} from 'react';
 import {useAuth} from '@state/useAuth';
 import {displayNotification} from '@notification/notificationInitial';
 import {noti_Action} from '@notification/notificationContants';
@@ -12,9 +19,14 @@ import authService from '@service/auth.service';
 import {CollectionsType} from '@service/config';
 import {uploadToS3} from '@service/uploadToS3';
 import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
+import CustomText from '@components/ui/CustomText';
+import {Colors} from '@utils/Constants';
+import {navigate} from '@utils/NavigationUtils';
+import {ROUTES} from '@navigation/Routes';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Profile: FC = () => {
-  const {signOut, user} = useAuth();
+  const {signOut, user, setIsUpdateUser} = useAuth();
   const [image, setImage] = useState<string | null>(null);
   const [imageData, setImageData] = useState<Asset | null>(null);
   const [imagePicked, setImagePicked] = useState(false);
@@ -83,6 +95,16 @@ const Profile: FC = () => {
     }
   };
 
+  const onClickFollow = () => {
+    navigate(ROUTES.FOLLOWERLIST);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsUpdateUser(true);
+    }, [setIsUpdateUser]),
+  );
+
   return (
     <CustomSafeAreaView>
       <View style={styles.container}>
@@ -111,6 +133,19 @@ const Profile: FC = () => {
           style={styles.editButton}
           textColor="orange"
         />
+        <View style={styles.followContainer}>
+          <TouchableOpacity onPress={onClickFollow}>
+            <CustomText style={styles.followInfo}>
+              Followers: {user?.followers?.length || 0}
+            </CustomText>
+          </TouchableOpacity>
+          <View style={styles.divider} />
+          <TouchableOpacity onPress={onClickFollow}>
+            <CustomText style={styles.followInfo}>
+              Following: {user?.following?.length || 0}
+            </CustomText>
+          </TouchableOpacity>
+        </View>
         <ActivityLoaderModal visible={loading} />
       </View>
     </CustomSafeAreaView>
@@ -143,5 +178,24 @@ const styles = StyleSheet.create({
     borderColor: 'orange',
     width: 200,
     alignSelf: 'center',
+  },
+  followContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  followInfo: {
+    textAlign: 'center',
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  divider: {
+    height: '60%',
+    backgroundColor: Colors.disabled,
+    width: 1.5,
+    marginHorizontal: 10,
+    alignSelf: 'center',
+    marginTop: 10,
   },
 });

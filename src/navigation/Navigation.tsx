@@ -2,7 +2,7 @@ import React, {FC} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import {ROUTES} from './Routes';
-import { navigationRef } from '@utils/NavigationUtils';
+import {navigationRef} from '@utils/NavigationUtils';
 import SplashScreen from '@screens/Splash/SplashScreen';
 import OnBoardingA from '@screens/OnBoadring/OnBoardingA';
 import OnBoardingB from '@screens/OnBoadring/OnBoardingB';
@@ -10,6 +10,8 @@ import OnBoardingC from '@screens/OnBoadring/OnBoardingC';
 import OnBoardingD from '@screens/OnBoadring/OnBoardingD';
 import HomeScreen from '@screens/Home/HomeScreen';
 import Comments from '@screens/Comments/Comments';
+import FollwerList from '@screens/FollwerList/FollwerList';
+import NewMessages from '@screens/NewMessages/NewMessages';
 
 const Stack = createNativeStackNavigator();
 
@@ -133,22 +135,10 @@ const Navigation: FC = () => {
           name={ROUTES.ONBOARD_D}
           component={OnBoardingD}
         />
-        <Stack.Screen
-          name={ROUTES.HOME}
-          component={HomeScreen}
-        />
-        <Stack.Screen
-          name={ROUTES.COMMENTS}
-          component={Comments}
-        />
-        {/* <Stack.Screen
-          name={ROUTES.ORDERSUCCESS}
-          component={OrderSuccessWithStatusBar}
-        /> */}
-        {/* <Stack.Screen
-          name={ROUTES.LIVETRACKING}
-          component={LiveTrackingWithStatusBar}
-        /> */}
+        <Stack.Screen name={ROUTES.HOME} component={HomeScreen} />
+        <Stack.Screen name={ROUTES.COMMENTS} component={Comments} />
+        <Stack.Screen name={ROUTES.FOLLOWERLIST} component={FollwerList} />
+        <Stack.Screen name={ROUTES.NEWMESAAGES} component={NewMessages} />
         {/* <Stack.Screen name={ROUTES.PROFILE} component={ProfileWithStatusBar} /> */}
         {/* <Stack.Screen
           name={ROUTES.DELIVERYMAP}

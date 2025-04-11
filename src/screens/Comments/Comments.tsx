@@ -20,6 +20,7 @@ import {useAuth} from '@state/useAuth';
 import {v4 as uuidv4} from 'uuid';
 import DisplayComments from './DisplayComments';
 import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
+import authService, {UserData} from '@service/auth.service';
 
 const Comments = () => {
   const route = useRoute();
@@ -29,6 +30,7 @@ const Comments = () => {
   const {user} = useAuth();
   const [loading, setLoading] = useState(false);
   const [commentList, setCommentList] = useState<Comment[]>([]);
+  const [postUserData, setPostUserData] = useState<UserData[]>([]);
 
   const postComment = async () => {
     Keyboard.dismiss();
@@ -64,6 +66,7 @@ const Comments = () => {
   };
 
   const fetchComments = async (postId: string) => {
+    setLoading(true);
     try {
       const comments = await postService.getCommentsByPostId(postId);
       if (comments) {
@@ -71,12 +74,27 @@ const Comments = () => {
       }
     } catch (error) {
       console.error('Error fetching comments:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getPostUseerData = async () => {
+    setLoading(true);
+    try {
+      const users = await authService.getAllUsers();
+      setPostUserData(users);
+    } catch (error) {
+      console.log('Error fetching users:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (postData?.comments) {
       setCommentList(postData?.comments);
+      getPostUseerData();
     }
   }, [postData]);
 
@@ -88,7 +106,13 @@ const Comments = () => {
           <FlatList
             data={commentList}
             keyExtractor={item => item.commentId}
-            renderItem={({item}) => <DisplayComments comment={item} />}
+            showsVerticalScrollIndicator={false}
+            renderItem={({item}) => {
+              const postUser = postUserData?.find(u => u.id === item.userId);
+              return postUser ? (
+                <DisplayComments comment={item} postUser={postUser} />
+              ) : null;
+            }}
           />
           <View style={styles.bottomContent}>
             <TextInput

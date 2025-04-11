@@ -3,17 +3,19 @@ import React, {FC} from 'react';
 import {Comment} from '@service/post.service';
 import {Colors, Fonts} from '@utils/Constants';
 import CustomText from '@components/ui/CustomText';
+import {UserData} from '@service/auth.service';
 
 interface Props {
   comment: Comment;
+  postUser: UserData;
 }
 
-const DisplayComments: FC<Props> = ({comment}) => {
+const DisplayComments: FC<Props> = ({comment, postUser}) => {
   return (
     <View style={styles.commentContainer}>
       <View style={styles.content}>
-        {comment?.profileUri ? (
-          <Image style={styles.image} source={{uri: comment?.profileUri}} />
+        {postUser?.photoURL ? (
+          <Image style={styles.image} source={{uri: postUser?.photoURL}} />
         ) : (
           <Image
             style={styles.image}
@@ -26,7 +28,7 @@ const DisplayComments: FC<Props> = ({comment}) => {
           fontFamily={Fonts.Regular}
           variant="h5"
           style={styles.textStyle}>
-          {comment?.userName}
+          {postUser?.displayName}
         </CustomText>
       </View>
 
