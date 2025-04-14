@@ -1,12 +1,12 @@
 import React, {FC, useState, useEffect, useCallback} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {TabView, TabBar} from 'react-native-tab-view';
-import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
-import CustomHeader from '@components/ui/CustomHeader';
-import CustomText from '@components/ui/CustomText';
-import {Colors, Fonts} from '@utils/Constants';
-import authService, {UserData} from '@service/auth.service';
-import {useAuth} from '@state/useAuth';
+import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
+import CustomHeader from '../../components/ui/CustomHeader';
+import CustomText from '../../components/ui/CustomText';
+import {Colors, Fonts} from '../../utils/Constants';
+import authService, {UserData} from '../../service/auth.service';
+import {useAuth} from '../../state/useAuth';
 import FollowersTab from './FollowersTab';
 
 const FollwerList: FC = () => {
@@ -19,8 +19,6 @@ const FollwerList: FC = () => {
     {key: 'followers', title: 'Followers', id: 0},
     {key: 'following', title: 'Following', id: 1},
   ]);
-
-  console.log('FollwerList', user);
 
   const fetchFollowersAndFollowing = useCallback(async () => {
     if (user) {
@@ -83,7 +81,7 @@ const FollwerList: FC = () => {
   return (
     <CustomSafeAreaView>
       <View style={styles.container}>
-        <CustomHeader title="Followers & Following" />
+        <CustomHeader title="Followers & Following" left={true} />
         <TabView
           navigationState={{index, routes}}
           renderScene={renderScene}

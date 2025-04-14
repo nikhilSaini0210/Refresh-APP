@@ -7,11 +7,9 @@ import {
   View,
 } from 'react-native';
 import React, {FC, useState} from 'react';
-import CustomText from '@components/ui/CustomText';
-import authService, {UserData} from '@service/auth.service';
-import {Colors, Fonts} from '@utils/Constants';
-import {navigate} from '@utils/NavigationUtils';
-import {ROUTES} from '@navigation/Routes';
+import CustomText from '../../components/ui/CustomText';
+import authService, {UserData} from '../../service/auth.service';
+import {Colors, Fonts} from '../../utils/Constants';
 
 interface Props {
   dataList: UserData[];
@@ -33,7 +31,6 @@ const FollowersTab: FC<Props> = ({
   user,
 }) => {
   const [loadingUserId, setLoadingUserId] = useState<string | null>(null);
-  console.log('FollowersTab', user);
 
   const handleFollow = async (targetUserId: string) => {
     setLoadingUserId(targetUserId);
@@ -50,7 +47,6 @@ const FollowersTab: FC<Props> = ({
                   : u,
               ),
             );
-            console.log('updatedUser', updatedUser);
           } else if (isTab === 'following') {
             setFollowing(prev => [
               ...prev,
@@ -104,7 +100,7 @@ const FollowersTab: FC<Props> = ({
           <Image source={{uri: item.photoURL}} style={styles.userImage} />
         ) : (
           <Image
-            source={require('@assets/images/user.png')}
+            source={require('../../assets/images/user.png')}
             style={styles.userImage}
           />
         )}
@@ -135,9 +131,6 @@ const FollowersTab: FC<Props> = ({
           )}
         </TouchableOpacity>
       )}
-      <TouchableOpacity onPress={() => navigate(ROUTES.NEWMESAAGES)}>
-        <CustomText>New Chat</CustomText>
-      </TouchableOpacity>
     </View>
   );
 

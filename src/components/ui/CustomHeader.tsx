@@ -1,7 +1,16 @@
-import {Pressable, SafeAreaView, StyleSheet, View} from 'react-native';
+import {
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Image,
+} from 'react-native';
 import React, {FC} from 'react';
-import {Colors, Fonts} from '@utils/Constants';
+import {Colors, Fonts} from '../../utils/Constants';
 import CustomText from './CustomText';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {goBack} from '../../utils/NavigationUtils';
 
 interface Props {
   title: string;
@@ -9,6 +18,8 @@ interface Props {
   onPress?: () => void;
   titleColor?: string;
   secondTitleColor?: string;
+  profileImage?: string;
+  left?: boolean;
 }
 
 const CustomHeader: FC<Props> = ({
@@ -17,11 +28,33 @@ const CustomHeader: FC<Props> = ({
   onPress,
   titleColor,
   secondTitleColor,
+  profileImage,
+  left = false,
 }) => {
   return (
     <SafeAreaView>
-      <View style={styles.flexRow}>
-        <View>
+      <View style={[styles.flexRow, !left && styles.justify]}>
+        {left && (
+          <TouchableOpacity onPress={() => goBack()}>
+            <Icon name="arrow-back" size={24} color="#000" />
+          </TouchableOpacity>
+        )}
+        <View style={styles.titleContainer}>
+          {profileImage ? (
+            profileImage === 'User' ? (
+              <Image
+                source={require('../../assets/images/user.png')}
+                style={styles.profileImage}
+                defaultSource={require('../../assets/images/user.png')}
+              />
+            ) : (
+              <Image
+                source={{uri: profileImage}}
+                style={styles.profileImage}
+                defaultSource={require('../../assets/images/user.png')}
+              />
+            )
+          ) : null}
           <CustomText
             style={[styles.text, {color: titleColor}]}
             variant="h5"
@@ -50,7 +83,6 @@ export default CustomHeader;
 
 const styles = StyleSheet.create({
   flexRow: {
-    justifyContent: 'space-between',
     padding: 10,
     height: 60,
     flexDirection: 'row',
@@ -60,7 +92,23 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     paddingHorizontal: 20,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
+  },
+  profileImage: {
+    width: 35,
+    height: 35,
+    borderRadius: 17.5,
+    marginRight: 8,
+  },
   text: {
     textAlign: 'center',
+  },
+  justify: {
+    justifyContent: 'space-between',
   },
 });

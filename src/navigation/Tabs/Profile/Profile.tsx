@@ -1,28 +1,21 @@
-import {
-  Alert,
-  Button,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Alert, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {FC, useCallback, useState} from 'react';
-import {useAuth} from '@state/useAuth';
-import {displayNotification} from '@notification/notificationInitial';
-import {noti_Action} from '@notification/notificationContants';
-import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
-import CustomHeader from '@components/ui/CustomHeader';
-import CustomButton from '@components/ui/CustomButton';
+import {useAuth} from '../../../state/useAuth';
+// import {displayNotification} from '@notification/notificationInitial';
+// import {noti_Action} from '@notification/notificationContants';
+import CustomSafeAreaView from '../../../components/global/CustomSafeAreaView';
+import CustomHeader from '../../../components/ui/CustomHeader';
+import CustomButton from '../../../components/ui/CustomButton';
 import {Asset} from 'react-native-image-picker';
-import {selectFromGallery, takePhoto} from '@service/imagePicker';
-import authService from '@service/auth.service';
-import {CollectionsType} from '@service/config';
-import {uploadToS3} from '@service/uploadToS3';
-import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
-import CustomText from '@components/ui/CustomText';
-import {Colors} from '@utils/Constants';
-import {navigate} from '@utils/NavigationUtils';
-import {ROUTES} from '@navigation/Routes';
+import {selectFromGallery, takePhoto} from '../../../service/imagePicker';
+import authService from '../../../service/auth.service';
+import {CollectionsType} from '../../../service/config';
+import {uploadToS3} from '../../../service/uploadToS3';
+import ActivityLoaderModal from '../../../components/global/ActivityLoaderModal';
+import CustomText from '../../../components/ui/CustomText';
+import {Colors} from '../../../utils/Constants';
+import {navigate} from '../../../utils/NavigationUtils';
+import {ROUTES} from '../../../navigation/Routes';
 import {useFocusEffect} from '@react-navigation/native';
 
 const Profile: FC = () => {
@@ -108,7 +101,12 @@ const Profile: FC = () => {
   return (
     <CustomSafeAreaView>
       <View style={styles.container}>
-        <CustomHeader title="Profile" />
+        <CustomHeader
+          title="Profile"
+          secondTitle="Logout"
+          secondTitleColor="blue"
+          onPress={logOut}
+        />
         <TouchableOpacity style={styles.profileButton}>
           {user ? (
             <Image
@@ -117,7 +115,7 @@ const Profile: FC = () => {
             />
           ) : (
             <Image
-              source={require('@assets/images/user.png')}
+              source={require('../../../assets/images/user.png')}
               style={styles.profileImage}
             />
           )}
@@ -145,6 +143,28 @@ const Profile: FC = () => {
               Following: {user?.following?.length || 0}
             </CustomText>
           </TouchableOpacity>
+        </View>
+        <View style={styles.userDetailsContainer}>
+          <View style={styles.inner}>
+            <View style={styles.detailRow}>
+              <CustomText style={styles.detailLabel}>Name:</CustomText>
+              <CustomText style={styles.detailValue}>
+                {user?.displayName || 'Not set'}
+              </CustomText>
+            </View>
+            <View style={styles.detailRow}>
+              <CustomText style={styles.detailLabel}>Email:</CustomText>
+              <CustomText style={styles.detailValue}>
+                {user?.email || 'Not set'}
+              </CustomText>
+            </View>
+            <View style={styles.detailRow}>
+              <CustomText style={styles.detailLabel}>Gender:</CustomText>
+              <CustomText style={styles.detailValue}>
+                {user?.gender || 'Not set'}
+              </CustomText>
+            </View>
+          </View>
         </View>
         <ActivityLoaderModal visible={loading} />
       </View>
@@ -197,5 +217,27 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     alignSelf: 'center',
     marginTop: 10,
+  },
+  userDetailsContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  inner: {
+    width: '70%',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  detailLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    width: 100,
+  },
+  detailValue: {
+    fontSize: 16,
+    color: Colors.text,
+    flex: 1,
   },
 });
