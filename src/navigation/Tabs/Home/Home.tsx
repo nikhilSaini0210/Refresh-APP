@@ -7,17 +7,17 @@ import {
   View,
 } from 'react-native';
 import React, {FC, useCallback, useState} from 'react';
-import postService, {Like, Post} from '@service/post.service';
-import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
-import CustomText from '@components/ui/CustomText';
-import {Fonts} from '@utils/Constants';
-import CustomHeader from '@components/ui/CustomHeader';
+import postService, {Like, Post} from '../../../service/post.service';
+import ActivityLoaderModal from '../../../components/global/ActivityLoaderModal';
+import CustomText from '../../../components/ui/CustomText';
+import {Fonts} from '../../../utils/Constants';
+import CustomHeader from '../../../components/ui/CustomHeader';
 import {RFValue} from 'react-native-responsive-fontsize';
-import {useAuth} from '@state/useAuth';
-import {navigate} from '@utils/NavigationUtils';
-import {ROUTES} from '@navigation/Routes';
+import {useAuth} from '../../../state/useAuth';
+import {navigate} from '../../../utils/NavigationUtils';
+import {ROUTES} from '../../../navigation/Routes';
 import {useFocusEffect} from '@react-navigation/native';
-import authService, {UserData} from '@service/auth.service';
+import authService, {UserData} from '../../../service/auth.service';
 
 const Home: FC = () => {
   const [loading, setLoading] = useState(false);
@@ -108,7 +108,7 @@ const Home: FC = () => {
                 ) : (
                   <Image
                     style={styles.userImage}
-                    source={require('@assets/images/user.png')}
+                    source={require('../../../assets/images/user.png')}
                   />
                 )}
                 {postUser && postUser?.displayName && (
@@ -126,7 +126,9 @@ const Home: FC = () => {
                 fontSize={RFValue(14)}>
                 {item?.caption}
               </CustomText>
+              <View>
               <Image source={{uri: item.imageUrl}} style={styles.image} />
+              </View>
               <View style={styles.lcContainer}>
                 <TouchableOpacity
                   style={styles.btn}
@@ -139,12 +141,12 @@ const Home: FC = () => {
                   </CustomText>
                   {checkLikeStatus(item) ? (
                     <Image
-                      source={require('@assets/images/heartred.png')}
+                      source={require('../../../assets/images/heartred.png')}
                       style={[styles.lcIcon]}
                     />
                   ) : (
                     <Image
-                      source={require('@assets/images/heart.png')}
+                      source={require('../../../assets/images/heart.png')}
                       style={styles.lcIcon}
                     />
                   )}
@@ -159,7 +161,7 @@ const Home: FC = () => {
                     {item.comments?.length ?? 0}
                   </CustomText>
                   <Image
-                    source={require('@assets/images/comment.png')}
+                    source={require('../../../assets/images/comment.png')}
                     style={styles.lcIcon}
                   />
                 </TouchableOpacity>
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '90%',
-    height: 120,
+    height: 400,
     alignSelf: 'center',
     borderRadius: 10,
     marginBottom: 20,
