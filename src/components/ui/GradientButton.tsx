@@ -4,10 +4,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 import React, {FC} from 'react';
 import CustomText from './CustomText';
-import {Colors, Fonts, gradientColor} from '@utils/Constants';
+import {Colors, Fonts, gradientColor} from '../../utils/Constants';
 import LinearGradient from 'react-native-linear-gradient';
 
 interface ButtonProps {
@@ -19,6 +20,8 @@ interface ButtonProps {
   textColor?: string;
   style?: any;
   iconB?: any;
+  btnStyle?: ViewStyle | ViewStyle[];
+  gradientColors?: string[];
 }
 
 const GradientButton: FC<ButtonProps> = ({
@@ -30,16 +33,18 @@ const GradientButton: FC<ButtonProps> = ({
   textColor = Colors.text,
   style = {},
   iconB,
+  btnStyle,
+  gradientColors = gradientColor,
 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={styles.btnTouch}
+      style={[styles.btnTouch, btnStyle]}
       activeOpacity={0.8}>
       <LinearGradient
         style={[styles.btn]}
-        colors={gradientColor}
+        colors={gradientColors}
         start={{x: 1, y: 1}}
         end={{x: 0, y: 1}}>
         {loading ? (

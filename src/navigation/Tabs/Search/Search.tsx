@@ -16,6 +16,8 @@ import CustomInput from '../../../components/ui/CustomInput';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {displayNotification} from '../../../notification/notificationInitial';
 import {noti_Action} from '../../../notification/notificationContants';
+import {navigate} from '../../../utils/NavigationUtils';
+import {ROUTES} from '../../../navigation/Routes';
 
 const Search: FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,12 +58,12 @@ const Search: FC = () => {
         const res = await authService.followUser(user.id, targetUserId);
         if (res) {
           setCurrentUser(res);
-            await displayNotification(
+          await displayNotification(
             user?.displayName,
             `You started following ${res.displayName}`,
             user?.photoURL || require('../../../assets/images/user.png'),
             noti_Action.FOLLOW,
-            );
+          );
         }
         fetchUsers();
       }
@@ -93,6 +95,10 @@ const Search: FC = () => {
     return currentUser?.following?.includes(targetUserId);
   };
 
+  const goToProfile = (item: UserData) => {
+    navigate(ROUTES.PROFILEVISIT, {item: item});
+  };
+
   useEffect(() => {
     fetchUsers();
     if (user) {
@@ -117,7 +123,9 @@ const Search: FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.flistContent}
         renderItem={({item}) => (
-          <TouchableOpacity style={styles.userContainer}>
+          <TouchableOpacity
+            style={styles.userContainer}
+            onPress={() => goToProfile(item)}>
             <View style={styles.userRow}>
               {item.photoURL ? (
                 <Image source={{uri: item.photoURL}} style={styles.userImage} />

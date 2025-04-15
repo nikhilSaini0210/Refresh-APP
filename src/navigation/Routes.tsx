@@ -10,4 +10,5 @@ export enum ROUTES {
   NEWMESAAGES = '/new_messages',
   IMAGEVIEWER = '/imageviewer',
   PROFILEVISIT = '/profilevisit',
+  POST_DETAIL = '/post_detail',
 }

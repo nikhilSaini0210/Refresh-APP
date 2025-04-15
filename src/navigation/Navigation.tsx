@@ -14,6 +14,7 @@ import FollwerList from '../screens/FollwerList/FollwerList';
 import NewMessages from '../screens/NewMessages/NewMessages';
 import ImageView from '../screens/NewMessages/ImageView';
 import ProfileVisit from '../screens/ProfileVisit/ProfileVisit';
+import PostDetail from '../screens/PostDetail/PostDetail';
 
 const Stack = createNativeStackNavigator();
 
@@ -74,6 +75,7 @@ const Navigation: FC = () => {
         <Stack.Screen name={ROUTES.NEWMESAAGES} component={NewMessages} />
         <Stack.Screen name={ROUTES.IMAGEVIEWER} component={ImageView} />
         <Stack.Screen name={ROUTES.PROFILEVISIT} component={ProfileVisit} />
+        <Stack.Screen name={ROUTES.POST_DETAIL} component={PostDetail} />
       </Stack.Navigator>
     </NavigationContainer>
   );

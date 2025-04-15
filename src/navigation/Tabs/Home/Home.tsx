@@ -27,7 +27,7 @@ const Home: FC = () => {
 
   const onPressProfileImage = (postUser: UserData | undefined) => {
     if (postUser) {
-      navigate(ROUTES.PROFILEVISIT);
+      navigate(ROUTES.PROFILEVISIT, {item: postUser});
     } else {
       resetAndNavigate(ROUTES.ONBOARD_A);
     }
