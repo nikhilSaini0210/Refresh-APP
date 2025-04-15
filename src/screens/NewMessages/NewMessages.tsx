@@ -17,8 +17,9 @@ import {Asset} from 'react-native-image-picker';
 import {selectFromGallery, takePhoto} from '../../service/imagePicker';
 import ActivityLoaderModal from '../../components/global/ActivityLoaderModal';
 import {uploadToS3} from '../../service/uploadToS3';
-import ImageModal from '../../components/ui/ImageModal';
 import CustomHeader from '../../components/ui/CustomHeader';
+import {navigate} from '../../utils/NavigationUtils';
+import {ROUTES} from '../../navigation/Routes';
 
 interface RouteParams extends Record<string, object | undefined> {
   params: {
@@ -34,13 +35,10 @@ const NewMessages: FC = () => {
   const [image, setImage] = useState<string | null>(null);
   const [imageData, setImageData] = useState<Asset | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [fullSizeImage, setFullsizeImage] = useState<string | null>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
   const toggleModal = (uri: string | null) => {
-    setFullsizeImage(uri);
-    setModalVisible(!isModalVisible);
+    navigate(ROUTES.IMAGEVIEWER, {item: uri});
   };
 
   const getMessages = useCallback(async () => {
@@ -203,13 +201,6 @@ const NewMessages: FC = () => {
             </View>
           )}
         />
-        {isModalVisible && (
-          <ImageModal
-            visible={isModalVisible}
-            onPress={() => toggleModal(null)}
-            imageUri={fullSizeImage || ''}
-          />
-        )}
         <ActivityLoaderModal visible={loading} />
       </View>
     </CustomSafeAreaView>

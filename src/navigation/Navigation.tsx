@@ -2,16 +2,17 @@ import React, {FC} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import {ROUTES} from './Routes';
-import {navigationRef} from '@utils/NavigationUtils';
-import SplashScreen from '@screens/Splash/SplashScreen';
-import OnBoardingA from '@screens/OnBoadring/OnBoardingA';
-import OnBoardingB from '@screens/OnBoadring/OnBoardingB';
-import OnBoardingC from '@screens/OnBoadring/OnBoardingC';
-import OnBoardingD from '@screens/OnBoadring/OnBoardingD';
-import HomeScreen from '@screens/Home/HomeScreen';
-import Comments from '@screens/Comments/Comments';
-import FollwerList from '@screens/FollwerList/FollwerList';
-import NewMessages from '@screens/NewMessages/NewMessages';
+import {navigationRef} from '../utils/NavigationUtils';
+import SplashScreen from '../screens/Splash/SplashScreen';
+import OnBoardingA from '../screens/OnBoadring/OnBoardingA';
+import OnBoardingB from '../screens/OnBoadring/OnBoardingB';
+import OnBoardingC from '../screens/OnBoadring/OnBoardingC';
+import OnBoardingD from '../screens/OnBoadring/OnBoardingD';
+import HomeScreen from '../screens/Home/HomeScreen';
+import Comments from '../screens/Comments/Comments';
+import FollwerList from '../screens/FollwerList/FollwerList';
+import NewMessages from '../screens/NewMessages/NewMessages';
+import ImageView from '../screens/NewMessages/ImageView';
 
 const Stack = createNativeStackNavigator();
 
@@ -139,7 +140,7 @@ const Navigation: FC = () => {
         <Stack.Screen name={ROUTES.COMMENTS} component={Comments} />
         <Stack.Screen name={ROUTES.FOLLOWERLIST} component={FollwerList} />
         <Stack.Screen name={ROUTES.NEWMESAAGES} component={NewMessages} />
-        {/* <Stack.Screen name={ROUTES.PROFILE} component={ProfileWithStatusBar} /> */}
+        <Stack.Screen name={ROUTES.IMAGEVIEWER} component={ImageView} />
         {/* <Stack.Screen
           name={ROUTES.DELIVERYMAP}
           component={DeliveryMapWithStatusBar}
