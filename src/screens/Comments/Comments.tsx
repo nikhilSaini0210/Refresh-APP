@@ -11,16 +11,16 @@ import {
 import React, {useEffect, useState} from 'react';
 import 'firebase/firestore';
 import {useRoute} from '@react-navigation/native';
-import postService, {Comment, Post} from '@service/post.service';
-import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
-import CustomHeader from '@components/ui/CustomHeader';
-import {Colors} from '@utils/Constants';
-import CustomKeyboardDismiss from '@components/global/CustomKeyboardDismiss';
-import {useAuth} from '@state/useAuth';
+import postService, {Comment, Post} from '../../service/post.service';
+import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
+import CustomHeader from '../../components/ui/CustomHeader';
+import {Colors} from '../../utils/Constants';
+import CustomKeyboardDismiss from '../../components/global/CustomKeyboardDismiss';
+import {useAuth} from '../../state/useAuth';
 import {v4 as uuidv4} from 'uuid';
 import DisplayComments from './DisplayComments';
-import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
-import authService, {UserData} from '@service/auth.service';
+import ActivityLoaderModal from '../../components/global/ActivityLoaderModal';
+import authService, {UserData} from '../../service/auth.service';
 
 const Comments = () => {
   const route = useRoute();
@@ -91,6 +91,46 @@ const Comments = () => {
     }
   };
 
+  const handleDeleteComment = async (commentId: string) => {
+    if (!postData) {
+      return;
+    }
+
+    Alert.alert(
+      'Delete Comment',
+      'Are you sure you want to delete this comment?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            setLoading(true);
+            try {
+              const success = await postService.deleteComment(
+                postData.id,
+                commentId,
+              );
+              if (success) {
+                await fetchComments(postData.id);
+              } else {
+                Alert.alert('Error', 'Failed to delete comment');
+              }
+            } catch (error) {
+              console.error('Error deleting comment:', error);
+              Alert.alert('Error', 'Failed to delete comment');
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   useEffect(() => {
     if (postData?.comments) {
       setCommentList(postData?.comments);
@@ -102,7 +142,7 @@ const Comments = () => {
     <CustomSafeAreaView>
       <CustomKeyboardDismiss>
         <View style={styles.container}>
-          <CustomHeader title="Comments" />
+          <CustomHeader left={true} title="Comments" />
           <FlatList
             data={commentList}
             keyExtractor={item => item.commentId}
@@ -110,7 +150,15 @@ const Comments = () => {
             renderItem={({item}) => {
               const postUser = postUserData?.find(u => u.id === item.userId);
               return postUser ? (
-                <DisplayComments comment={item} postUser={postUser} />
+                <DisplayComments
+                  comment={item}
+                  postUser={postUser}
+                  onDelete={
+                    user?.id === item.userId
+                      ? () => handleDeleteComment(item.commentId)
+                      : undefined
+                  }
+                />
               ) : null;
             }}
           />
@@ -127,7 +175,7 @@ const Comments = () => {
               disabled={comment.length === 0}
               onPress={postComment}>
               <Image
-                source={require('@assets/images/send.png')}
+                source={require('../../assets/images/send.png')}
                 style={styles.send}
               />
             </TouchableOpacity>

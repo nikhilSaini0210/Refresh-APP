@@ -1,35 +1,52 @@
-import {Image, StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, View, TouchableOpacity} from 'react-native';
 import React, {FC} from 'react';
-import {Comment} from '@service/post.service';
-import {Colors, Fonts} from '@utils/Constants';
-import CustomText from '@components/ui/CustomText';
-import {UserData} from '@service/auth.service';
+import {Comment} from '../../service/post.service';
+import {Colors, Fonts} from '../../utils/Constants';
+import CustomText from '../../components/ui/CustomText';
+import {UserData} from '../../service/auth.service';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { navigate } from '../../utils/NavigationUtils';
+import { ROUTES } from '../../navigation/Routes';
 
 interface Props {
   comment: Comment;
   postUser: UserData;
+  onDelete?: () => void;
 }
 
-const DisplayComments: FC<Props> = ({comment, postUser}) => {
+const DisplayComments: FC<Props> = ({comment, postUser, onDelete}) => {
+  const onUser = () => {
+    if (comment) {
+      // navigate(ROUTES.PROFILEVISIT, {})
+    }
+  };
+
   return (
     <View style={styles.commentContainer}>
       <View style={styles.content}>
-        {postUser?.photoURL ? (
-          <Image style={styles.image} source={{uri: postUser?.photoURL}} />
-        ) : (
-          <Image
-            style={styles.image}
-            source={require('@assets/images/user.png')}
-          />
-        )}
+        <TouchableOpacity style={styles.btn} onPress={onUser}>
+          {postUser?.photoURL ? (
+            <Image style={styles.image} source={{uri: postUser?.photoURL}} />
+          ) : (
+            <Image
+              style={styles.image}
+              source={require('../../assets/images/user.png')}
+            />
+          )}
 
-        <CustomText
-          numberOfLine={1}
-          fontFamily={Fonts.Regular}
-          variant="h5"
-          style={styles.textStyle}>
-          {postUser?.displayName}
-        </CustomText>
+          <CustomText
+            numberOfLine={1}
+            fontFamily={Fonts.Regular}
+            variant="h5"
+            style={styles.textStyle}>
+            {postUser?.displayName}
+          </CustomText>
+        </TouchableOpacity>
+        {onDelete && (
+          <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+            <Icon name="trash-outline" size={16} color="#FF3B30" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.commetSection}>
@@ -52,9 +69,11 @@ const styles = StyleSheet.create({
   content: {
     width: '100%',
     paddingHorizontal: 15,
+    paddingVertical: 15,
+  },
+  btn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
   },
   image: {
     width: 40,
@@ -69,5 +88,11 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     paddingHorizontal: 10,
+  },
+  deleteButton: {
+    padding: 8,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 });

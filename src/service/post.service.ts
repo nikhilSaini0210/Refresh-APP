@@ -75,6 +75,8 @@ class PostService {
         userId,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
+        comments: [],
+        likes: [],
       };
 
       await setDoc(newPostRef, postData);
@@ -201,6 +203,23 @@ class PostService {
     } catch (error) {
       console.error('Error getting comments for post:', error);
       throw error;
+    }
+  }
+
+  async deleteComment(postId: string, commentId: string) {
+    try {
+      const post = await this.getPostById(postId);
+      if (post) {
+        const updatedComments = post.comments?.filter(
+          comment => comment.commentId !== commentId,
+        );
+        await this.updatePost(postId, {...post, comments: updatedComments});
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      return false;
     }
   }
 }
