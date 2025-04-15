@@ -18,6 +18,8 @@ import {navigate, resetAndNavigate} from '../../../utils/NavigationUtils';
 import {ROUTES} from '../../../navigation/Routes';
 import {useFocusEffect} from '@react-navigation/native';
 import authService, {UserData} from '../../../service/auth.service';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {formatFirestoreTimestamp} from '../../../utils/DateUtils';
 
 const Home: FC = () => {
   const [loading, setLoading] = useState(false);
@@ -122,12 +124,21 @@ const Home: FC = () => {
                   />
                 )}
                 {postUser && postUser?.displayName && (
-                  <CustomText
-                    style={styles.userName}
-                    fontFamily={Fonts.Medium}
-                    fontSize={RFValue(14)}>
-                    {postUser?.displayName}
-                  </CustomText>
+                  <View style={styles.userInfo}>
+                    <CustomText
+                      fontSize={RFValue(16)}
+                      fontFamily={Fonts.Medium}>
+                      {postUser?.displayName}
+                    </CustomText>
+                    <CustomText
+                      fontSize={RFValue(12)}
+                      fontFamily={Fonts.Regular}
+                      style={styles.timeText}>
+                      {item?.createdAt
+                        ? formatFirestoreTimestamp(item.createdAt)
+                        : 'recently'}
+                    </CustomText>
+                  </View>
                 )}
               </TouchableOpacity>
               <CustomText
@@ -137,43 +148,28 @@ const Home: FC = () => {
                 {item?.caption}
               </CustomText>
               <View>
-                <Image source={{uri: item.imageUrl}} style={styles.image} />
+                <Image source={{uri: item?.imageUrl}} style={styles.image} />
               </View>
               <View style={styles.lcContainer}>
                 <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => onLike(item)}>
-                  <CustomText
-                    fontFamily={Fonts.Regular}
-                    variant="h4"
-                    style={styles.lcText}>
-                    {item?.likes?.length ?? 0}
-                  </CustomText>
+                  onPress={() => onLike(item)}
+                  style={styles.actionButton}>
                   {checkLikeStatus(item) ? (
-                    <Image
-                      source={require('../../../assets/images/heartred.png')}
-                      style={[styles.lcIcon]}
-                    />
+                    <Icon name={'heart'} size={24} color={'#FF3B30'} />
                   ) : (
-                    <Image
-                      source={require('../../../assets/images/heart.png')}
-                      style={styles.lcIcon}
-                    />
+                    <Icon name={'heart-outline'} size={24} color={'#333'} />
                   )}
+                  <CustomText style={styles.actionText}>
+                    {item.likes?.length || 0}
+                  </CustomText>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => onComment(item)}>
-                  <CustomText
-                    fontFamily={Fonts.Regular}
-                    variant="h4"
-                    style={styles.lcText}>
-                    {item.comments?.length ?? 0}
+                  onPress={() => onComment(item)}
+                  style={styles.actionButton}>
+                  <Icon name="chatbubble-outline" size={24} color="#333" />
+                  <CustomText style={styles.actionText}>
+                    {item.comments?.length || 0}
                   </CustomText>
-                  <Image
-                    source={require('../../../assets/images/comment.png')}
-                    style={styles.lcIcon}
-                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -254,12 +250,21 @@ const styles = StyleSheet.create({
   btn: {
     flexDirection: 'row',
   },
-  lcIcon: {
-    width: 24,
-    height: 24,
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 24,
   },
-  lcText: {
-    marginRight: 5,
-    textAlign: 'center',
+  actionText: {
+    marginLeft: 6,
+    fontSize: RFValue(14),
+    color: '#333',
+  },
+  userInfo: {
+    marginLeft: 12,
+  },
+  timeText: {
+    color: '#666',
+    marginTop: 2,
   },
 });

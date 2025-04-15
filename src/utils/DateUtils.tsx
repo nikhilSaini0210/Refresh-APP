@@ -1,3 +1,5 @@
+import {formatDistanceToNow} from 'date-fns';
+
 export const formatISOToCustom = (isoString: string) => {
   const date = new Date(isoString);
 
@@ -24,4 +26,23 @@ export const formatISOToCustom = (isoString: string) => {
   const year = date.getUTCFullYear();
 
   return `${hours}:${minutes}:${seconds} ${day} ${month}, ${year}`;
+};
+
+interface FirestoreTimestamp {
+  _seconds: number;
+  _nanoseconds: number;
+}
+
+export const formatFirestoreTimestamp = (
+  timestamp: FirestoreTimestamp,
+): string => {
+  try {
+    const milliseconds =
+      timestamp._seconds * 1000 + timestamp._nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    return formatDistanceToNow(date, {addSuffix: true});
+  } catch (error) {
+    console.error('Error formatting timestamp:', error);
+    return 'recently';
+  }
 };

@@ -16,6 +16,7 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import {Fonts} from '../../utils/Constants';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {UserData} from '../../service/auth.service';
+import {formatFirestoreTimestamp} from '../../utils/DateUtils';
 
 const {width} = Dimensions.get('window');
 
@@ -64,7 +65,9 @@ const PostDetail: FC = () => {
                 fontSize={RFValue(12)}
                 fontFamily={Fonts.Regular}
                 style={styles.timeText}>
-                {/* Add timestamp formatting logic */}2 hours ago
+                {postData.post?.createdAt
+                  ? formatFirestoreTimestamp(postData.post?.createdAt)
+                  : 'recently'}
               </CustomText>
             </View>
           </View>
