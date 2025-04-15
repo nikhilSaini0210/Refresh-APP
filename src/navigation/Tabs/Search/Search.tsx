@@ -7,13 +7,15 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import React, {FC, useCallback, useEffect, useState} from 'react';
-import authService, {UserData} from '@service/auth.service';
-import {useAuth} from '@state/useAuth';
-import CustomText from '@components/ui/CustomText';
-import {Colors, Fonts} from '@utils/Constants';
-import CustomHeader from '@components/ui/CustomHeader';
-import CustomInput from '@components/ui/CustomInput';
+import authService, {UserData} from '../../../service/auth.service';
+import {useAuth} from '../../../state/useAuth';
+import CustomText from '../../../components/ui/CustomText';
+import {Colors, Fonts} from '../../../utils/Constants';
+import CustomHeader from '../../../components/ui/CustomHeader';
+import CustomInput from '../../../components/ui/CustomInput';
 import {RFValue} from 'react-native-responsive-fontsize';
+import {displayNotification} from '../../../notification/notificationInitial';
+import {noti_Action} from '../../../notification/notificationContants';
 
 const Search: FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,6 +56,12 @@ const Search: FC = () => {
         const res = await authService.followUser(user.id, targetUserId);
         if (res) {
           setCurrentUser(res);
+            await displayNotification(
+            user?.displayName,
+            `You started following ${res.displayName}`,
+            user?.photoURL || require('../../../assets/images/user.png'),
+            noti_Action.FOLLOW,
+            );
         }
         fetchUsers();
       }
@@ -115,7 +123,7 @@ const Search: FC = () => {
                 <Image source={{uri: item.photoURL}} style={styles.userImage} />
               ) : (
                 <Image
-                  source={require('@assets/images/user.png')}
+                  source={require('../../../assets/images/user.png')}
                   style={styles.userImage}
                 />
               )}
