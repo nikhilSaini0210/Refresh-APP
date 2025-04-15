@@ -23,8 +23,6 @@ const ImageView = () => {
   const route = useRoute<RouteProp<RouteParams, 'params'>>();
   const {item} = route.params;
 
-  console.log(item);
-
   return (
     <CustomSafeAreaView>
       <View style={styles.container}>

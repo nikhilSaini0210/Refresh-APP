@@ -14,7 +14,7 @@ import {Fonts} from '../../../utils/Constants';
 import CustomHeader from '../../../components/ui/CustomHeader';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {useAuth} from '../../../state/useAuth';
-import {navigate} from '../../../utils/NavigationUtils';
+import {navigate, resetAndNavigate} from '../../../utils/NavigationUtils';
 import {ROUTES} from '../../../navigation/Routes';
 import {useFocusEffect} from '@react-navigation/native';
 import authService, {UserData} from '../../../service/auth.service';
@@ -24,6 +24,14 @@ const Home: FC = () => {
   const [posts, setPosts] = useState<Post[] | []>([]);
   const {user} = useAuth();
   const [postUserData, setPostUserData] = useState<UserData[]>([]);
+
+  const onPressProfileImage = (postUser: UserData | undefined) => {
+    if (postUser) {
+      navigate(ROUTES.PROFILEVISIT);
+    } else {
+      resetAndNavigate(ROUTES.ONBOARD_A);
+    }
+  };
 
   const getAllPosts = async () => {
     setLoading(true);
@@ -99,7 +107,9 @@ const Home: FC = () => {
           const postUser = postUserData?.find(u => u.id === item.userId);
           return (
             <View style={styles.imageContainer}>
-              <View style={styles.userContent}>
+              <TouchableOpacity
+                onPress={() => onPressProfileImage(postUser)}
+                style={styles.userContent}>
                 {postUser && postUser?.photoURL ? (
                   <Image
                     style={styles.userImage}
@@ -119,7 +129,7 @@ const Home: FC = () => {
                     {postUser?.displayName}
                   </CustomText>
                 )}
-              </View>
+              </TouchableOpacity>
               <CustomText
                 style={styles.caption}
                 fontFamily={Fonts.Medium}
@@ -127,7 +137,7 @@ const Home: FC = () => {
                 {item?.caption}
               </CustomText>
               <View>
-              <Image source={{uri: item.imageUrl}} style={styles.image} />
+                <Image source={{uri: item.imageUrl}} style={styles.image} />
               </View>
               <View style={styles.lcContainer}>
                 <TouchableOpacity

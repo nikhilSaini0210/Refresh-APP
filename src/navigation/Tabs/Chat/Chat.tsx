@@ -43,7 +43,6 @@ const Chat: FC = () => {
     try {
       if (user?.id) {
         const chats = await chatsService.getLastChats(user.id);
-        console.log('Raw chats data:', chats);
         setLastChats(chats);
       }
     } catch (error: any) {

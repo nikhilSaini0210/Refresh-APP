@@ -13,6 +13,7 @@ import Comments from '../screens/Comments/Comments';
 import FollwerList from '../screens/FollwerList/FollwerList';
 import NewMessages from '../screens/NewMessages/NewMessages';
 import ImageView from '../screens/NewMessages/ImageView';
+import ProfileVisit from '../screens/ProfileVisit/ProfileVisit';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,75 +24,6 @@ const Stack = createNativeStackNavigator();
 //   </>
 // );
 
-// const ProductDashboardWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <ProductDashboard />
-//   </>
-// );
-
-// const ProductCategoriesWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <ProductCategories />
-//   </>
-// );
-
-// const ProductOrderWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <ProductOrder />
-//   </>
-// );
-
-// const DeliveryLoginWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <DeliveryLogin />
-//   </>
-// );
-
-// const CustomerLoginWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <CustomerLogin />
-//   </>
-// );
-
-// const DeliveryDashboardWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <DeliveryDashboard />
-//   </>
-// );
-
-// const OrderSuccessWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <OrderSuccess />
-//   </>
-// );
-
-// const LiveTrackingWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <LiveTracking />
-//   </>
-// );
-
-// const ProfileWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <Profile />
-//   </>
-// );
-
-// const DeliveryMapWithStatusBar: FC = () => (
-//   <>
-//     <CustomStatusBar />
-//     <DeliveryMap />
-//   </>
-// );
 
 const Navigation: FC = () => {
   return (
@@ -141,10 +73,7 @@ const Navigation: FC = () => {
         <Stack.Screen name={ROUTES.FOLLOWERLIST} component={FollwerList} />
         <Stack.Screen name={ROUTES.NEWMESAAGES} component={NewMessages} />
         <Stack.Screen name={ROUTES.IMAGEVIEWER} component={ImageView} />
-        {/* <Stack.Screen
-          name={ROUTES.DELIVERYMAP}
-          component={DeliveryMapWithStatusBar}
-        /> */}
+        <Stack.Screen name={ROUTES.PROFILEVISIT} component={ProfileVisit} />
       </Stack.Navigator>
     </NavigationContainer>
   );

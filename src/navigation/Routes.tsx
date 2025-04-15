@@ -9,4 +9,5 @@ export enum ROUTES {
   FOLLOWERLIST = '/follwerlist',
   NEWMESAAGES = '/new_messages',
   IMAGEVIEWER = '/imageviewer',
+  PROFILEVISIT = '/profilevisit',
 }
