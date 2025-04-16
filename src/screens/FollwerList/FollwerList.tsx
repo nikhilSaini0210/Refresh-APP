@@ -1,12 +1,12 @@
 import React, {FC, useState, useEffect, useCallback} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {TabView, TabBar} from 'react-native-tab-view';
-import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
-import CustomHeader from '../../components/ui/CustomHeader';
-import CustomText from '../../components/ui/CustomText';
-import {Colors, Fonts} from '../../utils/Constants';
-import authService, {UserData} from '../../service/auth.service';
-import {useAuth} from '../../state/useAuth';
+import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
+import CustomHeader from '@components/ui/CustomHeader';
+import CustomText from '@components/ui/CustomText';
+import {Colors, Fonts} from '@utils/Constants';
+import authService, {UserData} from '@service/auth.service';
+import {useAuth} from '@state/useAuth';
 import FollowersTab from './FollowersTab';
 
 const FollwerList: FC = () => {

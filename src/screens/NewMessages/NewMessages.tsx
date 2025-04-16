@@ -9,17 +9,17 @@ import {
 } from 'react-native';
 import React, {FC, useCallback, useEffect, useState} from 'react';
 import {GiftedChat, Send} from 'react-native-gifted-chat';
-import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
+import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
 import {useRoute, RouteProp} from '@react-navigation/native';
-import {useAuth} from '../../state/useAuth';
-import chaService, {ChatMessage} from '../../service/chats.service';
+import {useAuth} from '@state/useAuth';
+import chaService, {ChatMessage} from '@service/chats.service';
 import {Asset} from 'react-native-image-picker';
-import {selectFromGallery, takePhoto} from '../../service/imagePicker';
-import ActivityLoaderModal from '../../components/global/ActivityLoaderModal';
-import {uploadToS3} from '../../service/uploadToS3';
-import CustomHeader from '../../components/ui/CustomHeader';
-import {navigate} from '../../utils/NavigationUtils';
-import {ROUTES} from '../../navigation/Routes';
+import {selectFromGallery, takePhoto} from '@service/imagePicker';
+import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
+import {uploadToS3} from '@service/uploadToS3';
+import CustomHeader from '@components/ui/CustomHeader';
+import {navigate} from '@utils/NavigationUtils';
+import {ROUTES} from '@navigation/Routes';
 
 interface RouteParams extends Record<string, object | undefined> {
   params: {
@@ -179,14 +179,14 @@ const NewMessages: FC = () => {
                     />
                   ) : (
                     <Image
-                      source={require('../../assets/images/add-image.png')}
+                      source={require('@assets/images/add-image.png')}
                       style={styles.sendImage}
                     />
                   )}
                 </TouchableOpacity>
                 <Send {...props} containerStyle={styles.sendButton}>
                   <Image
-                    source={require('../../assets/images/send.png')}
+                    source={require('@assets/images/send.png')}
                     style={styles.sendImage}
                   />
                 </Send>

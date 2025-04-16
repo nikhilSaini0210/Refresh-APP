@@ -7,10 +7,10 @@ import {
   Image,
 } from 'react-native';
 import React, {FC} from 'react';
-import {Colors, Fonts} from '../../utils/Constants';
+import {Colors, Fonts} from '@utils/Constants';
 import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {goBack} from '../../utils/NavigationUtils';
+import {goBack} from '@utils/NavigationUtils';
 
 interface Props {
   title: string;
@@ -43,15 +43,15 @@ const CustomHeader: FC<Props> = ({
           {profileImage ? (
             profileImage === 'User' ? (
               <Image
-                source={require('../../assets/images/user.png')}
+                source={require('@assets/images/user.png')}
                 style={styles.profileImage}
-                defaultSource={require('../../assets/images/user.png')}
+                defaultSource={require('@assets/images/user.png')}
               />
             ) : (
               <Image
                 source={{uri: profileImage}}
                 style={styles.profileImage}
-                defaultSource={require('../../assets/images/user.png')}
+                defaultSource={require('@assets/images/user.png')}
               />
             )
           ) : null}

@@ -7,27 +7,37 @@ import {
   View,
 } from 'react-native';
 import React, {FC, useCallback, useState} from 'react';
-import postService, {Like, Post} from '../../../service/post.service';
-import ActivityLoaderModal from '../../../components/global/ActivityLoaderModal';
-import CustomText from '../../../components/ui/CustomText';
-import {Fonts} from '../../../utils/Constants';
-import CustomHeader from '../../../components/ui/CustomHeader';
+import postService, {Like, Post} from '@service/post.service';
+import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
+import CustomText from '@components/ui/CustomText';
+import {Fonts} from '@utils/Constants';
+import CustomHeader from '@components/ui/CustomHeader';
 import {RFValue} from 'react-native-responsive-fontsize';
-import {useAuth} from '../../../state/useAuth';
-import {navigate, resetAndNavigate} from '../../../utils/NavigationUtils';
-import {ROUTES} from '../../../navigation/Routes';
+import {useAuth} from '@state/useAuth';
+import {navigate, resetAndNavigate} from '@utils/NavigationUtils';
+import {ROUTES} from '@navigation/Routes';
 import {useFocusEffect} from '@react-navigation/native';
-import authService, {UserData} from '../../../service/auth.service';
+import authService, {UserData} from '@service/auth.service';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {formatFirestoreTimestamp} from '../../../utils/DateUtils';
+import {formatFirestoreTimestamp} from '@utils/DateUtils';
 
-const Home: FC = () => {
+interface Props {
+  onPressTab: (tab: any) => void;
+}
+
+const Home: FC<Props> = ({onPressTab}) => {
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState<Post[] | []>([]);
   const {user} = useAuth();
   const [postUserData, setPostUserData] = useState<UserData[]>([]);
 
   const onPressProfileImage = (postUser: UserData | undefined) => {
+    if (postUser && user) {
+      if (postUser.id === user.id) {
+        onPressTab(4);
+        return;
+      }
+    }
     if (postUser) {
       navigate(ROUTES.PROFILEVISIT, {item: postUser.id});
     } else {
@@ -64,7 +74,6 @@ const Home: FC = () => {
       await postService.updatePost(item.id, updatedPost);
       await getAllPosts();
     } else {
-      // resetAndNavigate(ROUTES.ONBOARD_A);
       Alert.alert('Login', 'Please login again.');
     }
   };
@@ -120,7 +129,7 @@ const Home: FC = () => {
                 ) : (
                   <Image
                     style={styles.userImage}
-                    source={require('../../../assets/images/user.png')}
+                    source={require('@assets/images/user.png')}
                   />
                 )}
                 {postUser && postUser?.displayName && (

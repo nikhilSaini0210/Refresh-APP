@@ -1,8 +1,8 @@
 import {Image, StyleSheet, View} from 'react-native';
 import React, {FC} from 'react';
-import CustomText from '../../components/ui/CustomText';
+import CustomText from '@components/ui/CustomText';
 import {RFValue} from 'react-native-responsive-fontsize';
-import {Fonts} from '../../utils/Constants';
+import {Fonts} from '@utils/Constants';
 
 interface Props {
   name: string;
@@ -17,7 +17,7 @@ const ProfileContainer: FC<Props> = ({name, email, image}) => {
         <Image source={{uri: image}} style={styles.avatar} />
       ) : (
         <Image
-          source={require('../../assets/images/user.png')}
+          source={require('@assets/images/user.png')}
           style={styles.avatar}
         />
       )}

@@ -1,17 +1,7 @@
 import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
-import {ROUTES} from '@navigation/Routes';
-import {useAuth} from '@state/useAuth';
 import {TabButtons} from '@utils/DummyData';
-import {resetAndNavigate} from '@utils/NavigationUtils';
 import React, {useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  Alert,
-} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import TabButton from './TabButton';
 import Home from '@navigation/Tabs/Home/Home';
 import Search from '@navigation/Tabs/Search/Search';
@@ -20,32 +10,29 @@ import Chat from '@navigation/Tabs/Chat/Chat';
 import Profile from '@navigation/Tabs/Profile/Profile';
 import LinearGradient from 'react-native-linear-gradient';
 import {gradientColor} from '@utils/Constants';
+import {RouteProp, useRoute} from '@react-navigation/native';
+
+type HomeScreenRouteParams = {
+  params: {
+    item: {tab: number};
+  };
+};
 
 const HomeScreen = () => {
-  const [selectedTab, setSelectedTab] = useState(0);
-  const {user, signOut} = useAuth();
+  const route = useRoute<RouteProp<HomeScreenRouteParams, 'params'>>();
+  const rt = route?.params;
+  const tab = rt ? rt.item.tab : 0;
+  const [selectedTab, setSelectedTab] = useState(tab);
 
-  const handleSignOut = async () => {
-    try {
-      console.log(user);
-      if (
-        user?.providerId === 'google.com' ||
-        user?.providerId === 'facebook.com'
-      ) {
-        await signOut(user.providerId);
-      } else {
-        Alert.alert('Error', 'Unsupported provider');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to sign out');
-    }
+  const onSelectTab = (t: any) => {
+    setSelectedTab(t);
   };
 
   return (
     <CustomSafeAreaView>
       <View style={styles.container}>
         {selectedTab === 0 ? (
-          <Home />
+          <Home onPressTab={onSelectTab} />
         ) : selectedTab === 1 ? (
           <Search />
         ) : selectedTab === 2 ? (

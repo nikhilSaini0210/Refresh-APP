@@ -8,16 +8,16 @@ import {
   View,
 } from 'react-native';
 import React, {FC, useCallback, useState} from 'react';
-import CustomHeader from '../../../components/ui/CustomHeader';
-import CustomInput from '../../../components/ui/CustomInput';
-import authService, {UserData} from '../../../service/auth.service';
-import {useAuth} from '../../../state/useAuth';
-import SearchModal from '../../../components/ui/SearchModal';
-import CustomKeyboardDismiss from '../../../components/global/CustomKeyboardDismiss';
-import {navigate} from '../../../utils/NavigationUtils';
-import {ROUTES} from '../../../navigation/Routes';
-import chatsService, {LastChat} from '../../../service/chats.service';
-import {Colors} from '../../../utils/Constants';
+import CustomHeader from '@components/ui/CustomHeader';
+import CustomInput from '@components/ui/CustomInput';
+import authService, {UserData} from '@service/auth.service';
+import {useAuth} from '@state/useAuth';
+import SearchModal from '@components/ui/SearchModal';
+import CustomKeyboardDismiss from '@components/global/CustomKeyboardDismiss';
+import {navigate} from '@utils/NavigationUtils';
+import {ROUTES} from '@navigation/Routes';
+import chatsService, {LastChat} from '@service/chats.service';
+import {Colors} from '@utils/Constants';
 import { useFocusEffect } from '@react-navigation/native';
 
 interface RecentUser extends UserData {
@@ -109,7 +109,7 @@ const Chat: FC = () => {
         source={
           item.userAvatar
             ? {uri: item.userAvatar}
-            : require('../../../assets/images/user.png')
+            : require('@assets/images/user.png')
         }
         style={styles.avatar}
       />

@@ -1,7 +1,7 @@
 import {StyleSheet, View} from 'react-native';
 import React, {FC} from 'react';
-import CustomText from '../../components/ui/CustomText';
-import {Fonts} from '../../utils/Constants';
+import CustomText from '@components/ui/CustomText';
+import {Fonts} from '@utils/Constants';
 import {RFValue} from 'react-native-responsive-fontsize';
 
 interface Props {

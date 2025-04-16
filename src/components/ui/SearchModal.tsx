@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import React, {FC} from 'react';
-import {UserData} from '../../service/auth.service';
+import {UserData} from '@service/auth.service';
 
 interface RecentUser extends UserData {
   timestamp: number;
@@ -36,7 +36,7 @@ const SearchModal: FC<Peops> = ({
         source={
           item.photoURL
             ? {uri: item.photoURL}
-            : require('../../assets/images/user.png')
+            : require('@assets/images/user.png')
         }
         style={styles.avatar}
       />

@@ -1,6 +1,6 @@
 import {StyleSheet, View} from 'react-native';
 import React, {FC} from 'react';
-import GradientButton from '../../components/ui/GradientButton';
+import GradientButton from '@components/ui/GradientButton';
 
 interface Props {
   onMessage: () => void;

@@ -7,6 +7,7 @@ import {UserData} from '@service/auth.service';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {navigate} from '@utils/NavigationUtils';
 import {ROUTES} from '@navigation/Routes';
+import {useAuth} from '@state/useAuth';
 
 interface Props {
   comment: Comment;
@@ -15,8 +16,13 @@ interface Props {
 }
 
 const DisplayComments: FC<Props> = ({comment, postUser, onDelete}) => {
+  const {user} = useAuth();
   const onUser = () => {
     if (comment) {
+      if (user && user.id === comment.userId) {
+        navigate(ROUTES.HOME, {item: {tab: 4}});
+        return;
+      }
       navigate(ROUTES.PROFILEVISIT, {item: comment.userId});
     }
   };

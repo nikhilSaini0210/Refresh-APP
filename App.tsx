@@ -5,7 +5,7 @@ import {
   requestPermission,
 } from '@notification/notificationPermission';
 import React, {useEffect} from 'react';
-import {Platform, StatusBar} from 'react-native';
+import {Platform} from 'react-native';
 import '@notification/notificationListners';
 import {setCategories} from '@notification/notificationInitial';
 

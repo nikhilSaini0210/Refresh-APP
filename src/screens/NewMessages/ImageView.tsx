@@ -6,9 +6,9 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
-import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
+import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
 import {RouteProp, useRoute} from '@react-navigation/native';
-import {goBack} from '../../utils/NavigationUtils';
+import {goBack} from '@utils/NavigationUtils';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 interface RouteParams extends Record<string, object | undefined> {

@@ -7,9 +7,9 @@ import {
   View,
 } from 'react-native';
 import React, {FC, useState} from 'react';
-import CustomText from '../../components/ui/CustomText';
-import authService, {UserData} from '../../service/auth.service';
-import {Colors, Fonts} from '../../utils/Constants';
+import CustomText from '@components/ui/CustomText';
+import authService, {UserData} from '@service/auth.service';
+import {Colors, Fonts} from '@utils/Constants';
 
 interface Props {
   dataList: UserData[];
@@ -100,7 +100,7 @@ const FollowersTab: FC<Props> = ({
           <Image source={{uri: item.photoURL}} style={styles.userImage} />
         ) : (
           <Image
-            source={require('../../assets/images/user.png')}
+            source={require('@assets/images/user.png')}
             style={styles.userImage}
           />
         )}

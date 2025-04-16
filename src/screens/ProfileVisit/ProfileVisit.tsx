@@ -11,7 +11,6 @@ import {navigate} from '@utils/NavigationUtils';
 import {ROUTES} from '@navigation/Routes';
 import {useAuth} from '@state/useAuth';
 import postService, {Post} from '@service/post.service';
-// import PhotoGrid from './PhotoGrid';
 import CustomText from '@components/ui/CustomText';
 import PhotoGrid from '@components/ui/PhotoGrid';
 
@@ -176,5 +175,5 @@ const styles = StyleSheet.create({
   },
   marginTop: {
     marginTop: 10,
-  }
+  },
 });

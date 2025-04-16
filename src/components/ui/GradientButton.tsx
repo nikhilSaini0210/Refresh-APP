@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import React, {FC} from 'react';
 import CustomText from './CustomText';
-import {Colors, Fonts, gradientColor} from '../../utils/Constants';
+import {Colors, Fonts, gradientColor} from '@utils/Constants';
 import LinearGradient from 'react-native-linear-gradient';
 
 interface ButtonProps {
