@@ -96,7 +96,7 @@ const Search: FC = () => {
   };
 
   const goToProfile = (item: UserData) => {
-    navigate(ROUTES.PROFILEVISIT, {item: item});
+    navigate(ROUTES.PROFILEVISIT, {item: item.id});
   };
 
   useEffect(() => {

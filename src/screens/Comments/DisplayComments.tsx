@@ -1,12 +1,12 @@
 import {Image, StyleSheet, View, TouchableOpacity} from 'react-native';
 import React, {FC} from 'react';
-import {Comment} from '../../service/post.service';
-import {Colors, Fonts} from '../../utils/Constants';
-import CustomText from '../../components/ui/CustomText';
-import {UserData} from '../../service/auth.service';
+import {Comment} from '@service/post.service';
+import {Colors, Fonts} from '@utils/Constants';
+import CustomText from '@components/ui/CustomText';
+import {UserData} from '@service/auth.service';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { navigate } from '../../utils/NavigationUtils';
-import { ROUTES } from '../../navigation/Routes';
+import {navigate} from '@utils/NavigationUtils';
+import {ROUTES} from '@navigation/Routes';
 
 interface Props {
   comment: Comment;
@@ -17,7 +17,7 @@ interface Props {
 const DisplayComments: FC<Props> = ({comment, postUser, onDelete}) => {
   const onUser = () => {
     if (comment) {
-      // navigate(ROUTES.PROFILEVISIT, {})
+      navigate(ROUTES.PROFILEVISIT, {item: comment.userId});
     }
   };
 

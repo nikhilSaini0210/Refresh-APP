@@ -11,16 +11,16 @@ import {
 import React, {useEffect, useState} from 'react';
 import 'firebase/firestore';
 import {useRoute} from '@react-navigation/native';
-import postService, {Comment, Post} from '../../service/post.service';
-import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
-import CustomHeader from '../../components/ui/CustomHeader';
-import {Colors} from '../../utils/Constants';
-import CustomKeyboardDismiss from '../../components/global/CustomKeyboardDismiss';
-import {useAuth} from '../../state/useAuth';
+import postService, {Comment, Post} from '@service/post.service';
+import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
+import CustomHeader from '@components/ui/CustomHeader';
+import {Colors} from '@utils/Constants';
+import CustomKeyboardDismiss from '@components/global/CustomKeyboardDismiss';
+import {useAuth} from '@state/useAuth';
 import {v4 as uuidv4} from 'uuid';
 import DisplayComments from './DisplayComments';
-import ActivityLoaderModal from '../../components/global/ActivityLoaderModal';
-import authService, {UserData} from '../../service/auth.service';
+import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
+import authService, {UserData} from '@service/auth.service';
 
 const Comments = () => {
   const route = useRoute();
@@ -175,7 +175,7 @@ const Comments = () => {
               disabled={comment.length === 0}
               onPress={postComment}>
               <Image
-                source={require('../../assets/images/send.png')}
+                source={require('@assets/images/send.png')}
                 style={styles.send}
               />
             </TouchableOpacity>

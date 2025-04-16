@@ -29,7 +29,7 @@ const Home: FC = () => {
 
   const onPressProfileImage = (postUser: UserData | undefined) => {
     if (postUser) {
-      navigate(ROUTES.PROFILEVISIT, {item: postUser});
+      navigate(ROUTES.PROFILEVISIT, {item: postUser.id});
     } else {
       resetAndNavigate(ROUTES.ONBOARD_A);
     }

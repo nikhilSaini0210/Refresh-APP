@@ -16,27 +16,25 @@ import CustomText from '../../components/ui/CustomText';
 
 type ProfileVisitRouteParams = {
   params: {
-    item: UserData;
+    item: string;
   };
 };
 
 const ProfileVisit: FC = () => {
   const route = useRoute<RouteProp<ProfileVisitRouteParams, 'params'>>();
   const {item} = route?.params;
-  const [userInfo, setUserInfo] = useState<UserData | null>(item);
+  const [userInfo, setUserInfo] = useState<UserData | null>(null);
   const [isFollow, setIsFollow] = useState(false);
   const {user, setIsUpdateUser} = useAuth();
   const [loadingUser, setLoadingUser] = useState<boolean>(false);
   const [visitUserPosts, setVisitUserPosts] = useState<Post[]>([]);
 
-  const getVisitUser = async () => {
-    if (userInfo) {
-      const visitUser = await authService.getUserById(userInfo.id);
-      if (visitUser) {
-        setUserInfo(visitUser);
-      }
+  const getVisitUser = useCallback(async (id: string) => {
+    const visitUser = await authService.getUserById(id);
+    if (visitUser) {
+      setUserInfo(visitUser);
     }
-  };
+  }, []);
 
   const onPressMessage = () => {
     if (userInfo) {
@@ -56,7 +54,7 @@ const ProfileVisit: FC = () => {
         const updatedUser = await authService.followUser(user.id, userInfo?.id);
         if (updatedUser) {
           setIsUpdateUser(true);
-          await getVisitUser();
+          await getVisitUser(userInfo.id);
         }
       }
     } catch (error) {
@@ -76,7 +74,7 @@ const ProfileVisit: FC = () => {
         );
         if (updatedUser) {
           setIsUpdateUser(true);
-          await getVisitUser();
+          await getVisitUser(userInfo.id);
         }
       }
     } catch (error) {
@@ -96,6 +94,12 @@ const ProfileVisit: FC = () => {
       setVisitUserPosts(posts);
     }
   }, []);
+
+  useEffect(() => {
+    if (item) {
+      getVisitUser(item);
+    }
+  }, [getVisitUser, item]);
 
   useEffect(() => {
     if (userInfo && user) {
