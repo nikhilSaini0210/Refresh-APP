@@ -8,15 +8,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {useRoute, RouteProp} from '@react-navigation/native';
-import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
-import BackButton from '../../components/ui/BackButton';
-import CustomText from '../../components/ui/CustomText';
-import {Post} from '../../service/post.service';
+import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
+import BackButton from '@components/ui/BackButton';
+import CustomText from '@components/ui/CustomText';
+import {Post} from '@service/post.service';
 import {RFValue} from 'react-native-responsive-fontsize';
-import {Fonts} from '../../utils/Constants';
+import {Fonts} from '@utils/Constants';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {UserData} from '../../service/auth.service';
-import {formatFirestoreTimestamp} from '../../utils/DateUtils';
+import {UserData} from '@service/auth.service';
+import {formatFirestoreTimestamp} from '@utils/DateUtils';
 
 const {width} = Dimensions.get('window');
 

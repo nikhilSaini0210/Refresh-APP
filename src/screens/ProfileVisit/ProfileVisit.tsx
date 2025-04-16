@@ -1,18 +1,19 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {FC, useCallback, useEffect, useState} from 'react';
-import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
+import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
 import {useRoute, RouteProp} from '@react-navigation/native';
-import authService, {UserData} from '../../service/auth.service';
-import BackButton from '../../components/ui/BackButton';
+import authService, {UserData} from '@service/auth.service';
+import BackButton from '@components/ui/BackButton';
 import ProfileContainer from './ProfileContainer';
 import StatsContainer from './StatsContainer';
 import ButtonContainer from './ButtonContainer';
-import {navigate} from '../../utils/NavigationUtils';
-import {ROUTES} from '../../navigation/Routes';
-import {useAuth} from '../../state/useAuth';
-import postService, {Post} from '../../service/post.service';
-import PhotoGrid from './PhotoGrid';
-import CustomText from '../../components/ui/CustomText';
+import {navigate} from '@utils/NavigationUtils';
+import {ROUTES} from '@navigation/Routes';
+import {useAuth} from '@state/useAuth';
+import postService, {Post} from '@service/post.service';
+// import PhotoGrid from './PhotoGrid';
+import CustomText from '@components/ui/CustomText';
+import PhotoGrid from '@components/ui/PhotoGrid';
 
 type ProfileVisitRouteParams = {
   params: {
@@ -117,30 +118,34 @@ const ProfileVisit: FC = () => {
     <CustomSafeAreaView>
       <View style={styles.container}>
         <BackButton />
-        <View style={styles.profileInfo}>
-          <ProfileContainer
-            name={userInfo?.displayName ?? 'User'}
-            email={userInfo?.email ?? 'user@email.com'}
-            image={userInfo?.photoURL}
-          />
-          <StatsContainer
-            fansCount={userInfo?.followers?.length ?? 0}
-            followingCount={userInfo?.following?.length ?? 0}
-            postCount={visitUserPosts?.length ?? 0}
-          />
-          <ButtonContainer
-            onMessage={onPressMessage}
-            isFollow={isFollow}
-            onPress={isFollow ? handleUnfollow : handleFollow}
-            loading={loadingUser}
-          />
-          <View style={styles.tabContainer}>
-            <TouchableOpacity style={[styles.tab, styles.activeTab]}>
-              <CustomText>Photo</CustomText>
-            </TouchableOpacity>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.profileInfo}>
+            <ProfileContainer
+              name={userInfo?.displayName ?? 'User'}
+              email={userInfo?.email ?? 'user@email.com'}
+              image={userInfo?.photoURL}
+            />
+            <StatsContainer
+              fansCount={userInfo?.followers?.length ?? 0}
+              followingCount={userInfo?.following?.length ?? 0}
+              postCount={visitUserPosts?.length ?? 0}
+            />
+            <ButtonContainer
+              onMessage={onPressMessage}
+              isFollow={isFollow}
+              onPress={isFollow ? handleUnfollow : handleFollow}
+              loading={loadingUser}
+            />
+            <View style={styles.tabContainer}>
+              <TouchableOpacity style={[styles.tab, styles.activeTab]}>
+                <CustomText>Photo</CustomText>
+              </TouchableOpacity>
+            </View>
           </View>
-          <PhotoGrid posts={visitUserPosts} onPressPhoto={handlePhotoPress} />
-        </View>
+          <View style={styles.marginTop}>
+            <PhotoGrid posts={visitUserPosts} onPressPhoto={handlePhotoPress} />
+          </View>
+        </ScrollView>
       </View>
     </CustomSafeAreaView>
   );
@@ -169,4 +174,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: '#F3A8CE',
   },
+  marginTop: {
+    marginTop: 10,
+  }
 });
