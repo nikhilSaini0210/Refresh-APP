@@ -3,6 +3,7 @@ import {
   Image,
   ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -25,19 +26,22 @@ import {useFocusEffect} from '@react-navigation/native';
 import {RFValue} from 'react-native-responsive-fontsize';
 import postService, {Post} from '@service/post.service';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import VideoGrid from '@components/ui/VideoGrid';
-import PhotoGrid from '@components/ui/PhotoGrid';
+import IIcon from 'react-native-vector-icons/Ionicons';
+import VideoGrid from '@components/Profile/VideoGrid';
+import PhotoGrid from '@components/Profile/PhotoGrid';
+import {Gender, TabType} from './types';
+import {tabs} from '@utils/DummyData';
+import About from '@components/Profile/About';
+import GenderAge from '@components/Profile/GenderAge';
 
 const Profile: FC = () => {
   const {signOut, user, setIsUpdateUser} = useAuth();
   const [image, setImage] = useState<string | null>(null);
-  const [selectTab, setSelectTab] = useState(0);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [imageData, setImageData] = useState<Asset | null>(null);
   const [imagePicked, setImagePicked] = useState(false);
-
-  const tabs = ['Photo', 'Video', 'About', 'Favorite'];
+  const [activeTab, setActiveTab] = useState<TabType>('Photo');
 
   const logOut = async () => {
     setLoading(true);
@@ -126,6 +130,32 @@ const Profile: FC = () => {
     navigate(ROUTES.POST_DETAIL, {postData: {post, userInfo: user}});
   };
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'Photo':
+        return <PhotoGrid posts={userPosts} onPressPhoto={handlePhotoPress} />;
+      case 'About':
+        return <About />;
+      case 'Video':
+        return (
+          <View style={styles.emptyStateContainer}>
+            <IIcon name="videocam-outline" size={48} color="#ccc" />
+            <Text style={styles.emptyStateText}>No videos yet</Text>
+          </View>
+          // <VideoGrid posts={userPosts} />
+        );
+      case 'Favorite':
+        return (
+          <View style={styles.emptyStateContainer}>
+            <IIcon name="heart-outline" size={48} color="#ccc" />
+            <Text style={styles.emptyStateText}>No favorites yet</Text>
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
   useEffect(() => {
     if (user) {
       getUserPost(user?.id);
@@ -148,7 +178,9 @@ const Profile: FC = () => {
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}>
+        contentContainerStyle={[
+          activeTab === 'About' ? styles.aboutContent : styles.content,
+        ]}>
         <View style={styles.profileSection}>
           {user ? (
             <Image
@@ -172,7 +204,8 @@ const Profile: FC = () => {
             <TouchableOpacity
               style={styles.editButton}
               onPress={() =>
-                imagePicked ? editProfile() : handleImageSelection('gallery')
+                // imagePicked ? editProfile() : handleImageSelection('gallery')
+                navigate(ROUTES.EDIT_PROFILE)
               }>
               {imagePicked ? (
                 <Icon name="save" size={20} color={'#F3A8CE'} />
@@ -181,6 +214,8 @@ const Profile: FC = () => {
               )}
             </TouchableOpacity>
           </View>
+
+          <GenderAge gender={user?.gender as Gender} age="24" />
 
           <CustomText fontSize={RFValue(14)} style={styles.username}>
             {user?.email ?? 'user@email.com'}
@@ -230,16 +265,14 @@ const Profile: FC = () => {
         <View style={styles.tabsContainer}>
           {tabs.map((tab, index) => (
             <TouchableOpacity
-              onPress={() => setSelectTab(index)}
+              onPress={() => setActiveTab(tab as TabType)}
               key={index}
-              style={[styles.tab, index === selectTab && styles.activeTab]}>
+              style={[styles.tab, tab === activeTab && styles.activeTab]}>
               <CustomText
                 fontSize={RFValue(11)}
-                fontFamily={
-                  index === selectTab ? Fonts.SemiBold : Fonts.Regular
-                }
+                fontFamily={tab === activeTab ? Fonts.SemiBold : Fonts.Regular}
                 style={[
-                  index === selectTab ? styles.activeTabText : styles.tabText,
+                  tab === activeTab ? styles.activeTabText : styles.tabText,
                 ]}>
                 {tab}
               </CustomText>
@@ -247,15 +280,7 @@ const Profile: FC = () => {
           ))}
         </View>
 
-        {selectTab === 0 && (
-          <PhotoGrid
-            posts={userPosts}
-            onPressPhoto={handlePhotoPress}
-            // scrollEnabled={false}
-          />
-        )}
-
-        {selectTab === 1 && <VideoGrid posts={userPosts} />}
+        {renderTabContent()}
       </ScrollView>
       <ActivityLoaderModal visible={loading} />
     </View>
@@ -271,6 +296,10 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingVertical: 20,
+  },
+  aboutContent: {
+    paddingTop: 20,
+    paddingBottom: 50,
   },
   profileSection: {
     alignItems: 'center',
@@ -328,7 +357,6 @@ const styles = StyleSheet.create({
   profileHeaderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
   },
   editButton: {
     marginLeft: 12,
@@ -339,5 +367,15 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyStateContainer: {
+    padding: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyStateText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#666',
   },
 });

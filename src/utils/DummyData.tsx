@@ -16,8 +16,25 @@ export const Genders = [
 
 export const TabButtons = [
   {_id: 0, title: 'home', icon: require('@assets/images/home.png')},
-  {_id: 1, title: 'search', icon:  require('@assets/images/search.png')},
-  {_id: 2, title: 'add', icon:  require('@assets/images/add.png')},
-  {_id: 3, title: 'chat', icon:  require('@assets/images/chat.png')},
-  {_id: 4, title: 'profile', icon:  require('@assets/images/profile.png')},
+  {_id: 1, title: 'search', icon: require('@assets/images/search.png')},
+  {_id: 2, title: 'add', icon: require('@assets/images/add.png')},
+  {_id: 3, title: 'chat', icon: require('@assets/images/chat.png')},
+  {_id: 4, title: 'profile', icon: require('@assets/images/profile.png')},
+];
+
+export const tabs = ['Photo', 'Video', 'About', 'Favorite'];
+
+export const months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];

@@ -3,6 +3,7 @@ import {S3Client} from '@aws-sdk/client-s3';
 export const GOOGLE_WEB_CLIENT_ID =
   '37585022096-halucdk8av5jdpl4a7oop33uq6nk7jpd.apps.googleusercontent.com';
 export const USER_DATA_KEY = '@user_data';
+export const USER_UPDATED_KEY = '@user_updated_data';
 
 export enum CollectionsType {
   Users = 'users',

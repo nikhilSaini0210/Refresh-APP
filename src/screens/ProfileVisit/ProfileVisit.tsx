@@ -12,7 +12,7 @@ import {ROUTES} from '@navigation/Routes';
 import {useAuth} from '@state/useAuth';
 import postService, {Post} from '@service/post.service';
 import CustomText from '@components/ui/CustomText';
-import PhotoGrid from '@components/ui/PhotoGrid';
+import PhotoGrid from '@components/Profile/PhotoGrid';
 
 type ProfileVisitRouteParams = {
   params: {

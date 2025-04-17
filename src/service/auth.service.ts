@@ -31,6 +31,11 @@ export interface UserData {
   fcmToken?: string;
   following?: string[];
   followers?: string[];
+  bio?: string;
+  dob?: string;
+  work?: string;
+  education?: string;
+  hometown?: string;
 }
 
 interface TokenData {
@@ -43,7 +48,6 @@ interface TokenData {
 
 class AuthService {
   private db = getFirestore();
-
 
   private async requestNotificationPermission(): Promise<string | null> {
     try {
@@ -114,6 +118,15 @@ class AuthService {
             photoURL: userCredential.user.photoURL || '',
             providerId: 'google.com',
             fcmToken: fcmToken || undefined,
+            age: '',
+            gender: '',
+            following: [],
+            followers: [],
+            bio: '',
+            dob: '',
+            work: '',
+            education: '',
+            hometown: '',
           };
           if (userData.id) {
             await this.storeUserData(userData as UserData);
@@ -211,6 +224,15 @@ class AuthService {
               photoURL: userCredential.user.photoURL || '',
               providerId: 'facebook.com',
               fcmToken: fcmToken || undefined,
+              age: '',
+              gender: '',
+              following: [],
+              followers: [],
+              bio: '',
+              dob: '',
+              work: '',
+              education: '',
+              hometown: '',
             };
 
             await this.storeUserData(userData as UserData);
