@@ -46,3 +46,34 @@ export const formatFirestoreTimestamp = (
     return 'recently';
   }
 };
+
+export const calculateAge = (dob: string): number => {
+  try {
+    const trimmedDob = dob.trim();
+    if (!/^(\d{2})\/(\d{2})\/(\d{4})$/.test(trimmedDob)) {
+      throw new Error("Invalid date format. Expected 'DD/MM/YYYY'.");
+    }
+
+    const [day, month, year] = trimmedDob.split('/').map(Number);
+    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 0) {
+      throw new Error('Invalid date parts. Check the day, month, and year.');
+    }
+    const dobDate = new Date(year, month - 1, day);
+    if (isNaN(dobDate.getTime())) {
+      throw new Error('Invalid date object creation.');
+    }
+    const today = new Date();
+    let age = today.getFullYear() - dobDate.getFullYear();
+    const hasBirthdayPassedThisYear =
+      today.getMonth() > dobDate.getMonth() ||
+      (today.getMonth() === dobDate.getMonth() &&
+        today.getDate() >= dobDate.getDate());
+
+    if (!hasBirthdayPassedThisYear) {
+      age -= 1;
+    }
+    return age;
+  } catch (error: any) {
+    return NaN;
+  }
+};

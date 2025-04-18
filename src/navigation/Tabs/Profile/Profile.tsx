@@ -1,5 +1,4 @@
 import {
-  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -9,14 +8,7 @@ import {
 } from 'react-native';
 import React, {FC, useCallback, useEffect, useState} from 'react';
 import {useAuth} from '@state/useAuth';
-// import {displayNotification} from '@notification/notificationInitial';
-// import {noti_Action} from '@notification/notificationContants';
 import CustomHeader from '@components/ui/CustomHeader';
-import {Asset} from 'react-native-image-picker';
-import {selectFromGallery, takePhoto} from '@service/imagePicker';
-import authService from '@service/auth.service';
-import {CollectionsType} from '@service/config';
-import {uploadToS3} from '@service/uploadToS3';
 import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
 import CustomText from '@components/ui/CustomText';
 import {Fonts} from '@utils/Constants';
@@ -27,20 +19,16 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import postService, {Post} from '@service/post.service';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import IIcon from 'react-native-vector-icons/Ionicons';
-import VideoGrid from '@components/Profile/VideoGrid';
 import PhotoGrid from '@components/Profile/PhotoGrid';
 import {Gender, TabType} from './types';
-import {tabs} from '@utils/DummyData';
+import {customUser, tabs} from '@utils/DummyData';
 import About from '@components/Profile/About';
 import GenderAge from '@components/Profile/GenderAge';
 
 const Profile: FC = () => {
   const {signOut, user, setIsUpdateUser} = useAuth();
-  const [image, setImage] = useState<string | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
-  const [imageData, setImageData] = useState<Asset | null>(null);
-  const [imagePicked, setImagePicked] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('Photo');
 
   const logOut = async () => {
@@ -63,58 +51,6 @@ const Profile: FC = () => {
     // );
   };
 
-  const editProfile = async () => {
-    setLoading(true);
-    try {
-      if (imageData && imageData.uri && user) {
-        const imageUrl = await uploadToS3(
-          imageData.uri,
-          imageData.fileName,
-          imageData.type,
-        );
-        const userData = {
-          ...user,
-          photoURL: imageUrl,
-        };
-        await authService.updateUserDataInFirestore(
-          user?.id,
-          userData,
-          CollectionsType.Users,
-        );
-      } else {
-        Alert.alert('Error', 'Please select profil image.');
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-      setImagePicked(false);
-    }
-  };
-
-  const handleImageSelection = async (type: 'camera' | 'gallery') => {
-    setLoading(true);
-    try {
-      let selectedImage: Asset | null;
-
-      if (type === 'camera') {
-        selectedImage = await takePhoto();
-      } else {
-        selectedImage = await selectFromGallery();
-      }
-
-      if (selectedImage && selectedImage.uri) {
-        setImage(selectedImage.uri);
-        setImageData(selectedImage);
-        setImagePicked(true);
-      }
-    } catch (error) {
-      console.error('Error selecting image:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getUserPost = useCallback(async (id: string) => {
     const posts = await postService.getPostsByUserId(id);
     if (posts) {
@@ -135,7 +71,7 @@ const Profile: FC = () => {
       case 'Photo':
         return <PhotoGrid posts={userPosts} onPressPhoto={handlePhotoPress} />;
       case 'About':
-        return <About />;
+        return <About about={user || customUser} />;
       case 'Video':
         return (
           <View style={styles.emptyStateContainer}>
@@ -183,10 +119,7 @@ const Profile: FC = () => {
         ]}>
         <View style={styles.profileSection}>
           {user ? (
-            <Image
-              source={{uri: image ? image : user.photoURL}}
-              style={styles.profileImage}
-            />
+            <Image source={{uri: user.photoURL}} style={styles.profileImage} />
           ) : (
             <Image
               source={require('@assets/images/user.png')}
@@ -203,19 +136,12 @@ const Profile: FC = () => {
             </CustomText>
             <TouchableOpacity
               style={styles.editButton}
-              onPress={() =>
-                // imagePicked ? editProfile() : handleImageSelection('gallery')
-                navigate(ROUTES.EDIT_PROFILE)
-              }>
-              {imagePicked ? (
-                <Icon name="save" size={20} color={'#F3A8CE'} />
-              ) : (
-                <Icon name="edit-square" size={20} color="#F7B174" />
-              )}
+              onPress={() => navigate(ROUTES.EDIT_PROFILE)}>
+              <Icon name="edit-square" size={20} color="#F7B174" />
             </TouchableOpacity>
           </View>
 
-          <GenderAge gender={user?.gender as Gender} age="24" />
+          <GenderAge gender={user?.gender as Gender} age={user?.age || '18'} />
 
           <CustomText fontSize={RFValue(14)} style={styles.username}>
             {user?.email ?? 'user@email.com'}

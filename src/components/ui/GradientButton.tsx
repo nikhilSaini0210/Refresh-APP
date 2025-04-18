@@ -14,8 +14,8 @@ import LinearGradient from 'react-native-linear-gradient';
 interface ButtonProps {
   onPress: () => void;
   title: string;
-  disabled: boolean;
-  loading: boolean;
+  disabled?: boolean;
+  loading?: boolean;
   icon?: any;
   textColor?: string;
   style?: any;

@@ -38,3 +38,22 @@ export const months = [
   'Nov',
   'Dec',
 ];
+
+export const customUser = {
+  id: '1',
+  email: 'user@email.com',
+  displayName: 'user',
+  photoURL: require('@assets/images/user.png'),
+  providerId: 'g.com',
+  age: '18',
+  gender: 'Male',
+  fcmToken: 'werr',
+  following: [],
+  followers: [],
+  bio: `Professional photographer and digital artist. Capturing moments and
+          creating memories. Based in New York City 📍`,
+  dob: '01/01/2001',
+  work: 'Photo',
+  education: 'B.tech',
+  hometown: 'India',
+};

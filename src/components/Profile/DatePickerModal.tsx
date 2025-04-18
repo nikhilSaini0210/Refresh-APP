@@ -5,11 +5,10 @@ import {
   StyleSheet,
   Modal,
   TouchableOpacity,
-  ScrollView,
+  FlatList,
   Dimensions,
+  ListRenderItemInfo,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {months} from '@utils/DummyData';
 
 interface DatePickerModalProps {
   visible: boolean;
@@ -18,83 +17,123 @@ interface DatePickerModalProps {
   initialDate?: string;
 }
 
+const ITEM_HEIGHT = 50;
+const PICKER_HEIGHT = 250;
+
 const DatePickerModal: React.FC<DatePickerModalProps> = ({
   visible,
   onClose,
   onSelect,
-  initialDate = '01/01/1910',
+  initialDate = '01/01/2000',
 }) => {
-  const [selectedDay, setSelectedDay] = useState<string>('01');
-  const [selectedMonth, setSelectedMonth] = useState<string>('Jan');
-  const [selectedYear, setSelectedYear] = useState<string>('1910');
-
-  const dayScrollViewRef = useRef<ScrollView>(null);
-  const monthScrollViewRef = useRef<ScrollView>(null);
-  const yearScrollViewRef = useRef<ScrollView>(null);
-
-  const days = Array.from({length: 31}, (_, i) =>
-    String(i + 1).padStart(2, '0'),
-  );
-
-  const years = Array.from({length: 200}, (_, i) => String(1910 + i));
-
-  // Set initial values based on initialDate
-  useEffect(() => {
+  const parseInitialDate = () => {
     if (initialDate) {
       const parts = initialDate.split('/');
       if (parts.length === 3) {
-        const [day, month, year] = parts;
-        setSelectedDay(day);
-        // Convert numeric month to name
-        const monthIndex = parseInt(month, 10) - 1;
+        const [day, monthNumber, year] = parts;
+        const monthIndex = parseInt(monthNumber, 10) - 1;
         if (monthIndex >= 0 && monthIndex < 12) {
-          setSelectedMonth(months[monthIndex]);
+          const monthNames = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+          ];
+          return {
+            day,
+            month: monthNames[monthIndex],
+            year,
+          };
         }
-        setSelectedYear(year);
+
+        return {day, month: 'Jan', year};
       }
     }
-  }, [initialDate]);
+    return {day: '01', month: 'Jan', year: '2000'};
+  };
 
-  // Set scroll position when the modal becomes visible
+  const initialDateValues = parseInitialDate();
+
+  const [selectedDay, setSelectedDay] = useState<string>(initialDateValues.day);
+  const [selectedMonth, setSelectedMonth] = useState<string>(
+    initialDateValues.month,
+  );
+  const [selectedYear, setSelectedYear] = useState<string>(
+    initialDateValues.year,
+  );
+
+  const dayListRef = useRef<FlatList>(null);
+  const monthListRef = useRef<FlatList>(null);
+  const yearListRef = useRef<FlatList>(null);
+
+  const days = Array.from({length: 31}, (_, i) =>
+    (i + 1).toString().padStart(2, '0'),
+  );
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  const years = Array.from({length: 100}, (_, i) => (i + 1970).toString());
+
   useEffect(() => {
     if (visible) {
       setTimeout(() => {
-        const dayIndex = days.findIndex(d => d === selectedDay);
-        if (dayScrollViewRef.current && dayIndex !== -1) {
-          dayScrollViewRef.current.scrollTo({
-            y: dayIndex * 50,
-            animated: false,
-          });
-        }
-
-        const monthIndex = months.findIndex(m => m === selectedMonth);
-        if (monthScrollViewRef.current && monthIndex !== -1) {
-          monthScrollViewRef.current.scrollTo({
-            y: monthIndex * 50,
-            animated: false,
-          });
-        }
-
-        const yearIndex = years.findIndex(y => y === selectedYear);
-        if (yearScrollViewRef.current && yearIndex !== -1) {
-          yearScrollViewRef.current.scrollTo({
-            y: yearIndex * 50,
-            animated: false,
-          });
-        }
+        scrollToInitialPositions();
       }, 200);
     }
-  }, [visible, selectedDay, selectedMonth, selectedYear, days, years]);
+  }, [visible]);
+
+  const scrollToInitialPositions = () => {
+    const dayIndex = days.findIndex(d => d === selectedDay);
+    if (dayIndex !== -1 && dayListRef.current) {
+      dayListRef.current.scrollToOffset({
+        offset: dayIndex * ITEM_HEIGHT,
+        animated: false,
+      });
+    }
+
+    const monthIndex = months.findIndex(m => m === selectedMonth);
+    if (monthIndex !== -1 && monthListRef.current) {
+      monthListRef.current.scrollToOffset({
+        offset: monthIndex * ITEM_HEIGHT,
+        animated: false,
+      });
+    }
+
+    const yearIndex = years.findIndex(y => y === selectedYear);
+    if (yearIndex !== -1 && yearListRef.current) {
+      yearListRef.current.scrollToOffset({
+        offset: yearIndex * ITEM_HEIGHT,
+        animated: false,
+      });
+    }
+  };
 
   const handleConfirm = async () => {
     try {
-      // Convert month name to number
       const monthNumber = (months.indexOf(selectedMonth) + 1)
         .toString()
         .padStart(2, '0');
       const formattedDate = `${selectedDay}/${monthNumber}/${selectedYear}`;
-
-      await AsyncStorage.setItem('user_birthday', formattedDate);
       onSelect(formattedDate);
       onClose();
     } catch (error) {
@@ -103,20 +142,89 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
   };
 
   const handleCancel = () => {
+    setSelectedDay(initialDateValues.day);
+    setSelectedMonth(initialDateValues.month);
+    setSelectedYear(initialDateValues.year);
     onClose();
   };
 
-  const handleScroll = (
-    event: {nativeEvent: {contentOffset: {y: number}}},
-    setter: React.Dispatch<React.SetStateAction<string>>,
-    items: string[],
-  ) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    const index = Math.round(offsetY / 50);
-    if (index >= 0 && index < items.length) {
-      setter(items[index]);
+  const getItemLayout = (data: any, index: number) => ({
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
+    index,
+  });
+
+  const handleDayChange = (index: number) => {
+    if (index >= 0 && index < days.length) {
+      setSelectedDay(days[index]);
     }
   };
+
+  const handleMonthChange = (index: number) => {
+    if (index >= 0 && index < months.length) {
+      setSelectedMonth(months[index]);
+    }
+  };
+
+  const handleYearChange = (index: number) => {
+    if (index >= 0 && index < years.length) {
+      setSelectedYear(years[index]);
+    }
+  };
+
+  const renderDay = ({item}: ListRenderItemInfo<string>) => (
+    <View
+      style={[
+        styles.pickerItem,
+        selectedDay === item && styles.selectedItemContainer,
+      ]}>
+      <Text
+        style={[
+          styles.pickerItemText,
+          selectedDay === item
+            ? styles.selectedItemText
+            : styles.unselectedItemText,
+        ]}>
+        {item}
+      </Text>
+    </View>
+  );
+
+  const renderMonth = ({item}: ListRenderItemInfo<string>) => (
+    <View
+      style={[
+        styles.pickerItem,
+        selectedMonth === item && styles.selectedItemContainer,
+      ]}>
+      <Text
+        style={[
+          styles.pickerItemText,
+          selectedMonth === item
+            ? styles.selectedItemText
+            : styles.unselectedItemText,
+        ]}>
+        {item}
+      </Text>
+    </View>
+  );
+
+  const renderYear = ({item}: ListRenderItemInfo<string>) => (
+    <View
+      style={[
+        styles.pickerItem,
+        selectedYear === item && styles.selectedItemContainer,
+      ]}>
+      <Text
+        style={[
+          styles.pickerItemText,
+          selectedYear === item
+            ? styles.selectedItemText
+            : styles.unselectedItemText,
+        ]}>
+        {item}
+      </Text>
+    </View>
+  );
 
   return (
     <Modal
@@ -126,104 +234,89 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
       onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          {/* Date Picker */}
           <View style={styles.pickerContainer}>
-            {/* Day Picker */}
             <View style={styles.pickerColumn}>
-              <ScrollView
-                ref={dayScrollViewRef}
+              <FlatList
+                ref={dayListRef}
+                data={days}
+                renderItem={renderDay}
+                keyExtractor={item => `day-${item}`}
+                getItemLayout={getItemLayout}
                 showsVerticalScrollIndicator={false}
-                snapToInterval={50}
+                snapToInterval={ITEM_HEIGHT}
                 decelerationRate="fast"
-                onMomentumScrollEnd={e => handleScroll(e, setSelectedDay, days)}
-                contentContainerStyle={styles.scrollContent}>
-                <View style={styles.paddingItem} />
-                {days.map(day => (
-                  <View key={`day-${day}`} style={styles.pickerItem}>
-                    <Text
-                      style={[
-                        styles.pickerItemText,
-                        selectedDay === day
-                          ? styles.selectedItemText
-                          : styles.unselectedItemText,
-                      ]}>
-                      {day}
-                    </Text>
-                  </View>
-                ))}
-                <View style={styles.paddingItem} />
-              </ScrollView>
+                onScrollToIndexFailed={() => {}}
+                onMomentumScrollEnd={e => {
+                  const offset = e.nativeEvent.contentOffset.y;
+                  const index = Math.round(offset / ITEM_HEIGHT);
+                  handleDayChange(index);
+                }}
+                ListHeaderComponent={<View style={styles.pickerHeaderFooter} />}
+                ListFooterComponent={<View style={styles.pickerHeaderFooter} />}
+                initialNumToRender={31}
+                maxToRenderPerBatch={31}
+                windowSize={5}
+                removeClippedSubviews={true}
+              />
               <View style={styles.highlightBar} pointerEvents="none" />
             </View>
-
-            {/* Month Picker */}
             <View style={styles.pickerColumn}>
-              <ScrollView
-                ref={monthScrollViewRef}
+              <FlatList
+                ref={monthListRef}
+                data={months}
+                renderItem={renderMonth}
+                keyExtractor={item => `month-${item}`}
+                getItemLayout={getItemLayout}
                 showsVerticalScrollIndicator={false}
-                snapToInterval={50}
+                snapToInterval={ITEM_HEIGHT}
                 decelerationRate="fast"
-                onMomentumScrollEnd={e =>
-                  handleScroll(e, setSelectedMonth, months)
-                }
-                contentContainerStyle={styles.scrollContent}>
-                <View style={styles.paddingItem} />
-                {months.map(month => (
-                  <View key={`month-${month}`} style={styles.pickerItem}>
-                    <Text
-                      style={[
-                        styles.pickerItemText,
-                        selectedMonth === month
-                          ? styles.selectedItemText
-                          : styles.unselectedItemText,
-                      ]}>
-                      {month}
-                    </Text>
-                  </View>
-                ))}
-                <View style={styles.paddingItem} />
-              </ScrollView>
+                onScrollToIndexFailed={() => {}}
+                onMomentumScrollEnd={e => {
+                  const offset = e.nativeEvent.contentOffset.y;
+                  const index = Math.round(offset / ITEM_HEIGHT);
+                  handleMonthChange(index);
+                }}
+                ListHeaderComponent={<View style={styles.pickerHeaderFooter} />}
+                ListFooterComponent={<View style={styles.pickerHeaderFooter} />}
+                initialNumToRender={12}
+                maxToRenderPerBatch={12}
+                windowSize={5}
+                removeClippedSubviews={true}
+              />
               <View style={styles.highlightBar} pointerEvents="none" />
             </View>
-
-            {/* Year Picker */}
             <View style={styles.pickerColumn}>
-              <ScrollView
-                ref={yearScrollViewRef}
+              <FlatList
+                ref={yearListRef}
+                data={years}
+                renderItem={renderYear}
+                keyExtractor={item => `year-${item}`}
+                getItemLayout={getItemLayout}
                 showsVerticalScrollIndicator={false}
-                snapToInterval={50}
+                snapToInterval={ITEM_HEIGHT}
                 decelerationRate="fast"
-                onMomentumScrollEnd={e =>
-                  handleScroll(e, setSelectedYear, years)
-                }
-                contentContainerStyle={styles.scrollContent}>
-                <View style={styles.paddingItem} />
-                {years.map(year => (
-                  <View key={`year-${year}`} style={styles.pickerItem}>
-                    <Text
-                      style={[
-                        styles.pickerItemText,
-                        selectedYear === year
-                          ? styles.selectedItemText
-                          : styles.unselectedItemText,
-                      ]}>
-                      {year}
-                    </Text>
-                  </View>
-                ))}
-                <View style={styles.paddingItem} />
-              </ScrollView>
+                onScrollToIndexFailed={() => {}}
+                onMomentumScrollEnd={e => {
+                  const offset = e.nativeEvent.contentOffset.y;
+                  const index = Math.round(offset / ITEM_HEIGHT);
+                  handleYearChange(index);
+                }}
+                ListHeaderComponent={<View style={styles.pickerHeaderFooter} />}
+                ListFooterComponent={<View style={styles.pickerHeaderFooter} />}
+                initialNumToRender={20}
+                maxToRenderPerBatch={20}
+                windowSize={7}
+                removeClippedSubviews={true}
+              />
               <View style={styles.highlightBar} pointerEvents="none" />
             </View>
           </View>
-
-          {/* Buttons */}
           <View style={styles.buttonsContainer}>
             <TouchableOpacity style={styles.button} onPress={handleCancel}>
-              <Text style={styles.buttonText}>CANCEL</Text>
+              <Text style={styles.cancelButtonText}>CANCEL</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-              <Text style={styles.buttonText}>CONFIRM</Text>
+              <Text style={styles.confirmButtonText}>CONFIRM</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -242,64 +335,78 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    width: width * 0.85,
+    width: width * 0.9,
     backgroundColor: 'white',
     borderRadius: 16,
     overflow: 'hidden',
   },
   pickerContainer: {
     flexDirection: 'row',
-    height: 220,
+    height: PICKER_HEIGHT,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#eee',
   },
   pickerColumn: {
     flex: 1,
-    height: 220,
+    height: PICKER_HEIGHT,
     position: 'relative',
-  },
-  scrollContent: {
-    paddingVertical: 85,
+    justifyContent: 'center',
   },
   pickerItem: {
-    height: 50,
+    height: ITEM_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  staticItem: {
+    height: ITEM_HEIGHT,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectedItemContainer: {
+    backgroundColor: 'rgba(232, 245, 255, 0.3)',
+  },
   pickerItemText: {
     fontSize: 20,
+    textAlign: 'center',
   },
   selectedItemText: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
   },
   unselectedItemText: {
     color: '#aaa',
+    fontSize: 18,
   },
-  paddingItem: {
-    height: 85,
+  pickerHeaderFooter: {
+    height: Math.floor((PICKER_HEIGHT - ITEM_HEIGHT) / 2),
   },
   highlightBar: {
     position: 'absolute',
-    top: 85,
+    top: (PICKER_HEIGHT - ITEM_HEIGHT) / 2,
     left: 0,
     right: 0,
-    height: 50,
+    height: ITEM_HEIGHT,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: '#80d8ff',
+    borderColor: '#cae7ff',
+    zIndex: -1,
   },
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
   },
   button: {
     paddingVertical: 10,
     paddingHorizontal: 16,
   },
-  buttonText: {
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFDE00',
+  },
+  confirmButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFDE00',
