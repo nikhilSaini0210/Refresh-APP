@@ -392,6 +392,7 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     paddingHorizontal: 16,
+    marginBottom: 15,
   },
 });
 
