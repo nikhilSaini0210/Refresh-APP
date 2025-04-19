@@ -31,6 +31,26 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>fb569944352145865</string>
+    </array>
+    </dict>
+  </array>
+  <key>FacebookAppID</key>
+  <string>569944352145865</string>
+  <key>FacebookDisplayName</key>
+  <string>Social App</string>
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+    <string>fbapi</string>
+    <string>fb-messenger-api</string>
+    <string>fbauth2</string>
+    <string>fbshareextension</string>
+  </array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
 	<key>UILaunchStoryboardName</key>
