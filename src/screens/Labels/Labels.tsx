@@ -1,3 +1,4 @@
+import {labels} from '@utils/DummyData';
 import React, {useState} from 'react';
 import {
   View,
@@ -9,93 +10,52 @@ import {
 } from 'react-native';
 
 const Labels = () => {
-  const [selectedLabels, setSelectedLabels] = useState<string[]>([
-    'Sensitive',
-    'Game',
-    'Music',
-    'Art',
-    'Travel',
-    'Sport',
-    'Photography',
-    'Emotion talk',
-  ]);
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const [aboutMeLabels, setAboutMeLabels] = useState<string[]>(labels.AboutMe);
+  const [myThingLabels, setMyThingLabels] = useState<string[]>(labels.MyThing);
+  const [inviteMeLabels, setInviyeMeLabels] = useState<string[]>(
+    labels.InviteMe,
+  );
 
   const maxLabels = 10;
 
-  const labels = {
-    AboutMe: [
-      'Passionate',
-      'Optimistic',
-      'Unpredictable',
-      'Single',
-      'Emotion mentor',
-      'Understanding',
-      'Charming',
-      'Lighthearted',
-      'Clumsy',
-      'Energetic',
-      'Vegetarian',
-      'Fun',
-      'Ambitious',
-      'Rational',
-      'Romantic',
-      'Mature',
-      'Sexy',
-      'Shapely',
-      'Slow to warm up',
-      'Pretty',
-      'Plump',
-      'Elegant',
-      'Cute',
-      'Handsome',
-      'Strong',
-      'Freshly young',
-    ],
-    MyThing: [
-      'Food',
-      'Movie',
-      'Idol',
-      'ACG',
-      'Party',
-      'Singing',
-      'Cat',
-      'Dog',
-      'K-pop',
-      'Fashion',
-      'Makeup',
-      'Outdoor',
-      'Variety',
-      'Dance',
-      'Binge-watching',
-    ],
-    InviteMe: [
-      'MLBB',
-      'Werewolf',
-      'Playmate',
-      'Chat',
-      'KTV',
-      'Dating',
-      'Group video',
-      'Ludo',
-    ],
-  };
-
-  const handleSelectLabel = (label: string) => {
-    if (selectedLabels.includes(label)) {
-      setSelectedLabels(selectedLabels.filter(item => item !== label));
-    } else if (selectedLabels.length < maxLabels) {
+  const handleSelectLabel = (label: string, title: string) => {
+    if (title === 'About Me') {
       setSelectedLabels([...selectedLabels, label]);
+      setAboutMeLabels(aboutMeLabels.filter(item => item !== label));
+    }
+    if (title === 'My Thing') {
+      setSelectedLabels([...selectedLabels, label]);
+      setMyThingLabels(myThingLabels.filter(item => item !== label));
+    }
+    if (title === 'Invite Me') {
+      setSelectedLabels([...selectedLabels, label]);
+      setInviyeMeLabels(inviteMeLabels.filter(item => item !== label));
+    }
+    if (title === 'Selected labels') {
+      if (labels.AboutMe.includes(label)) {
+        setSelectedLabels(selectedLabels.filter(item => item !== label));
+        setAboutMeLabels([...aboutMeLabels, label]);
+      }
+      if (labels.MyThing.includes(label)) {
+        setSelectedLabels(selectedLabels.filter(item => item !== label));
+        setMyThingLabels([...myThingLabels, label]);
+      }
+      if (labels.InviteMe.includes(label)) {
+        setSelectedLabels(selectedLabels.filter(item => item !== label));
+        setInviyeMeLabels([...inviteMeLabels, label]);
+      }
     }
   };
 
-  const renderLabel = (label: string) => (
+  const renderLabel = (label: string, title: string) => (
     <TouchableOpacity
       key={label}
       style={[
         styles.label,
         selectedLabels.includes(label) && styles.selectedLabel,
       ]}
-      onPress={() => handleSelectLabel(label)}>
+      onPress={() => handleSelectLabel(label, title)}>
       <Text
         style={[
           styles.labelText,
@@ -103,6 +63,16 @@ const Labels = () => {
         ]}>
         {label}
       </Text>
+      <View
+        style={{
+          position: 'absolute',
+          top: -5,
+          right: 0,
+          borderRadius: 50,
+          width: 15,
+          height: 15,
+          backgroundColor: 'red',
+        }}></View>
     </TouchableOpacity>
   );
 
@@ -111,7 +81,7 @@ const Labels = () => {
       <Text style={styles.sectionTitle}>{title}</Text>
       <FlatList
         data={data}
-        renderItem={({item}) => renderLabel(item)}
+        renderItem={({item}) => renderLabel(item, title)}
         keyExtractor={item => item}
         numColumns={3}
         scrollEnabled={false}
@@ -133,9 +103,10 @@ const Labels = () => {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        {renderSection('About Me', labels.AboutMe)}
-        {renderSection('My Thing', labels.MyThing)}
-        {renderSection('Invite Me', labels.InviteMe)}
+        {renderSection('Selected labels', selectedLabels)}
+        {renderSection('About Me', aboutMeLabels)}
+        {renderSection('My Thing', myThingLabels)}
+        {renderSection('Invite Me', inviteMeLabels)}
       </ScrollView>
     </View>
   );
@@ -190,6 +161,7 @@ const styles = StyleSheet.create({
     margin: 4,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 7,
   },
   selectedLabel: {
     backgroundColor: '#FFCC00',
