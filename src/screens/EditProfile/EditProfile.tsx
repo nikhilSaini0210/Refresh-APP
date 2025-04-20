@@ -406,7 +406,7 @@ const EditProfile = () => {
         {/* Labels Section */}
         <TouchableOpacity
           style={styles.section}
-          onPress={() => console.log('Edit labels')}>
+          onPress={() => navigate(ROUTES.LABELS)}>
           <CustomText
             fontFamily={Fonts.Medium}
             fontSize={RFValue(13)}

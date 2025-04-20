@@ -13,4 +13,5 @@ export enum ROUTES {
   POST_DETAIL = '/post_detail',
   ABOUT_EDIT = '/about_edit',
   EDIT_PROFILE = '/edit_profile',
+  LABELS = '/labels',
 }

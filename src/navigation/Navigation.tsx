@@ -17,6 +17,7 @@ import ProfileVisit from '@screens/ProfileVisit/ProfileVisit';
 import PostDetail from '@screens/PostDetail/PostDetail';
 import AboutEdit from '@screens/AboutEdit/AboutEdit';
 import EditProfile from '@screens/EditProfile/EditProfile';
+import Labels from '@screens/Labels/Labels';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +27,6 @@ const Stack = createNativeStackNavigator();
 //     <SplashScreen />
 //   </>
 // );
-
 
 const Navigation: FC = () => {
   return (
@@ -80,6 +80,7 @@ const Navigation: FC = () => {
         <Stack.Screen name={ROUTES.POST_DETAIL} component={PostDetail} />
         <Stack.Screen name={ROUTES.ABOUT_EDIT} component={AboutEdit} />
         <Stack.Screen name={ROUTES.EDIT_PROFILE} component={EditProfile} />
+        <Stack.Screen name={ROUTES.LABELS} component={Labels} />
       </Stack.Navigator>
     </NavigationContainer>
   );
