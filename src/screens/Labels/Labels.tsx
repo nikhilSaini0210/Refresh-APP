@@ -1,5 +1,8 @@
+import CustomText from '@components/ui/CustomText';
+import {Colors, Fonts} from '@utils/Constants';
 import {labels} from '@utils/DummyData';
 import React, {useState} from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {
   View,
   Text,
@@ -8,6 +11,9 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
+import {RFValue} from 'react-native-responsive-fontsize';
+import {goBack} from '@utils/NavigationUtils';
+import MixedButton from '@components/ui/MixedButton';
 
 const Labels = () => {
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
@@ -53,7 +59,13 @@ const Labels = () => {
       key={label}
       style={[
         styles.label,
-        selectedLabels.includes(label) && styles.selectedLabel,
+        selectedLabels.includes(label) && labels.AboutMe.includes(label)
+          ? styles.selectedLabel1
+          : selectedLabels.includes(label) && labels.MyThing.includes(label)
+          ? styles.selectedLabel2
+          : selectedLabels.includes(label) && labels.InviteMe.includes(label)
+          ? styles.selectedLabel3
+          : null,
       ]}
       onPress={() => handleSelectLabel(label, title)}>
       <Text
@@ -63,27 +75,34 @@ const Labels = () => {
         ]}>
         {label}
       </Text>
-      <View
-        style={{
-          position: 'absolute',
-          top: -5,
-          right: 0,
-          borderRadius: 50,
-          width: 15,
-          height: 15,
-          backgroundColor: 'red',
-        }}></View>
+      {title === 'Selected labels' && (
+        <View style={styles.crossButton}>
+          <CustomText
+            style={styles.cross}
+            fontFamily={Fonts.SemiBold}
+            fontSize={RFValue(8)}>
+            X
+          </CustomText>
+        </View>
+      )}
     </TouchableOpacity>
   );
 
   const renderSection = (title: string, data: string[]) => (
     <View key={title} style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      {title === 'Selected labels' ? (
+        <Text style={styles.sectionTitle}>
+          Selected labels ({selectedLabels.length}/{maxLabels})
+        </Text>
+      ) : (
+        <Text style={styles.sectionTitle}>{title}</Text>
+      )}
+
       <FlatList
         data={data}
         renderItem={({item}) => renderLabel(item, title)}
         keyExtractor={item => item}
-        numColumns={3}
+        // numColumns={3}
         scrollEnabled={false}
         contentContainerStyle={styles.labelsContainer}
       />
@@ -93,17 +112,31 @@ const Labels = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>
-          Selected labels ({selectedLabels.length}/{maxLabels})
-        </Text>
-        <TouchableOpacity style={styles.okButton}>
-          <Text style={styles.okButtonText}>OK</Text>
-        </TouchableOpacity>
+        <View style={styles.back}>
+          <TouchableOpacity onPress={goBack}>
+            <Icon name="arrow-back" size={26} color="#000" />
+          </TouchableOpacity>
+          <CustomText
+            variant="h5"
+            fontFamily={Fonts.SemiBold}
+            style={styles.headerText}>
+            Labels
+          </CustomText>
+        </View>
+        <View style={styles.okButtonCont}>
+          <MixedButton
+            title="OK"
+            textColor="#FFF"
+            style={styles.okButton}
+            onPress={() => {}}
+          />
+        </View>
       </View>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        {renderSection('Selected labels', selectedLabels)}
+        {selectedLabels.length > 0 &&
+          renderSection('Selected labels', selectedLabels)}
         {renderSection('About Me', aboutMeLabels)}
         {renderSection('My Thing', myThingLabels)}
         {renderSection('Invite Me', inviteMeLabels)}
@@ -122,22 +155,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 5,
+  },
+  back: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   headerText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#000',
+  },
+  okButtonCont: {
+    width: '20%',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   okButton: {
-    backgroundColor: '#FFCC00',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  okButtonText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
+    paddingVertical: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollContent: {
     paddingBottom: 16,
@@ -151,6 +188,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   labelsContainer: {
+    flexWrap: 'wrap',
+    flexDirection: 'row',
     justifyContent: 'flex-start',
   },
   label: {
@@ -163,15 +202,37 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 7,
   },
-  selectedLabel: {
-    backgroundColor: '#FFCC00',
+  selectedLabel1: {
+    backgroundColor: Colors.lightYellow,
+  },
+  selectedLabel2: {
+    backgroundColor: Colors.lightBlue2,
+  },
+  selectedLabel3: {
+    backgroundColor: Colors.lightPink2,
   },
   labelText: {
     fontSize: 14,
     color: '#000',
   },
   selectedLabelText: {
-    color: '#fff',
+    color: '#000',
+  },
+  cross: {
+    color: '#FFF',
+  },
+  crossButton: {
+    position: 'absolute',
+    top: -5,
+    right: 0,
+    borderRadius: 50,
+    width: 15,
+    height: 15,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderWidth: 1,
+    borderColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
