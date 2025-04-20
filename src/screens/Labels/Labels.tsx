@@ -1,31 +1,46 @@
 import CustomText from '@components/ui/CustomText';
 import {Colors, Fonts} from '@utils/Constants';
 import {labels} from '@utils/DummyData';
-import React, {useState} from 'react';
+import React, {FC, useState} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import {View, TouchableOpacity, ScrollView, StyleSheet} from 'react-native';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {goBack} from '@utils/NavigationUtils';
 import MixedButton from '@components/ui/MixedButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {RouteProp, useRoute} from '@react-navigation/native';
 
-const Labels = () => {
-  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+type LabelsEditRouteParams = {
+  params: {
+    labelsItem: string[];
+  };
+};
+
+const maxLabels = 10;
+
+const Labels: FC = () => {
+  const route = useRoute<RouteProp<LabelsEditRouteParams, 'params'>>();
+  const {labelsItem} = route?.params;
+  const [selectedLabels, setSelectedLabels] = useState<string[]>(
+    labelsItem && labelsItem.length > 0 ? labelsItem : [],
+  );
   const [aboutMeLabels, setAboutMeLabels] = useState<string[]>(labels.AboutMe);
   const [myThingLabels, setMyThingLabels] = useState<string[]>(labels.MyThing);
   const [inviteMeLabels, setInviyeMeLabels] = useState<string[]>(
     labels.InviteMe,
   );
 
-  const maxLabels = 10;
+  const areArraysEqual = (array1: string[], array2: string[]) => {
+    if (array1.length !== array2.length) {
+      return false;
+    }
+    return array1.every(item => array2.includes(item));
+  };
 
   const handleSelectLabel = (label: string, title: string) => {
+    if (selectedLabels.length === maxLabels) {
+      return;
+    }
     if (title === 'About Me') {
       setSelectedLabels([...selectedLabels, label]);
       setAboutMeLabels(aboutMeLabels.filter(item => item !== label));
@@ -54,9 +69,27 @@ const Labels = () => {
     }
   };
 
-  const renderLabel = (label: string, title: string) => (
+  const onSaveLabels = async () => {
+    try {
+      if (
+        labelsItem &&
+        labelsItem.length > 0 &&
+        areArraysEqual(selectedLabels, labelsItem)
+      ) {
+        goBack();
+        return;
+      }
+
+      await AsyncStorage.setItem('user_labels', JSON.stringify(selectedLabels));
+      goBack();
+    } catch (error) {
+      console.error('Error saving labels:', error);
+    }
+  };
+
+  const renderLabel = (label: string, title: string, index: number) => (
     <TouchableOpacity
-      key={label}
+      key={index}
       style={[
         styles.label,
         selectedLabels.includes(label) && labels.AboutMe.includes(label)
@@ -68,13 +101,16 @@ const Labels = () => {
           : null,
       ]}
       onPress={() => handleSelectLabel(label, title)}>
-      <Text
+      <CustomText
+        fontFamily={Fonts.Medium}
+        fontSize={RFValue(10)}
         style={[
-          styles.labelText,
-          selectedLabels.includes(label) && styles.selectedLabelText,
+          selectedLabels.includes(label)
+            ? styles.selectedLabelText
+            : styles.labelText,
         ]}>
         {label}
-      </Text>
+      </CustomText>
       {title === 'Selected labels' && (
         <View style={styles.crossButton}>
           <CustomText
@@ -105,14 +141,13 @@ const Labels = () => {
           {title}
         </CustomText>
       )}
-
-      <FlatList
-        data={data}
-        renderItem={({item}) => renderLabel(item, title)}
-        keyExtractor={item => item}
-        scrollEnabled={false}
+      <ScrollView
         contentContainerStyle={styles.labelsContainer}
-      />
+        scrollEnabled={false}>
+        {data.map((item, index) => (
+          <View key={index}>{renderLabel(item, title, index)}</View>
+        ))}
+      </ScrollView>
     </View>
   );
 
@@ -135,7 +170,7 @@ const Labels = () => {
             title="OK"
             textColor="#FFF"
             style={styles.okButton}
-            onPress={() => {}}
+            onPress={onSaveLabels}
           />
         </View>
       </View>
@@ -174,7 +209,7 @@ const styles = StyleSheet.create({
   },
   okButtonCont: {
     width: '20%',
-    height: 40,
+    height: 35,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -182,6 +217,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 5,
   },
   scrollContent: {
     paddingBottom: 16,
@@ -198,8 +234,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   label: {
-    backgroundColor: '#E0E0E0',
-    borderRadius: 16,
+    backgroundColor: '#EEEEEE',
+    borderRadius: 5,
     paddingHorizontal: 12,
     paddingVertical: 8,
     margin: 4,
@@ -217,7 +253,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightPink2,
   },
   labelText: {
-    fontSize: 14,
     color: '#000',
   },
   selectedLabelText: {
@@ -229,7 +264,7 @@ const styles = StyleSheet.create({
   crossButton: {
     position: 'absolute',
     top: -5,
-    right: 0,
+    right: -5,
     borderRadius: 50,
     width: 15,
     height: 15,

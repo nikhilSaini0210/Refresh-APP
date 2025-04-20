@@ -135,6 +135,19 @@ const EditProfile = () => {
             };
           });
         }
+        const sl = await AsyncStorage.getItem('user_labels');
+        const savedLabels = sl != null ? JSON.parse(sl) : profileData?.labels;
+        if (savedLabels) {
+          setProfileData(prev => {
+            if (!prev) {
+              return null;
+            }
+            return {
+              ...prev,
+              labels: savedLabels,
+            };
+          });
+        }
       }
     } catch (error) {
       console.error('Failed to load profile data:', error);
@@ -181,6 +194,7 @@ const EditProfile = () => {
       await AsyncStorage.removeItem('user_hometown');
       await AsyncStorage.removeItem('user_work');
       await AsyncStorage.removeItem('user_edu');
+      await AsyncStorage.removeItem('user_labels');
       setLoading(false);
     }
   };
@@ -251,6 +265,10 @@ const EditProfile = () => {
     setIsCameraTypeSelector(true);
   };
 
+  const handleEditLabels = async () => {
+    navigate(ROUTES.LABELS, {labelsItem: profileData?.labels});
+  };
+
   const renderSectionWithArrow = (
     title: string,
     value: string,
@@ -281,6 +299,7 @@ const EditProfile = () => {
     await AsyncStorage.removeItem('user_hometown');
     await AsyncStorage.removeItem('user_work');
     await AsyncStorage.removeItem('user_edu');
+    await AsyncStorage.removeItem('user_labels');
     await goBack();
   };
 
@@ -404,9 +423,7 @@ const EditProfile = () => {
         <View style={styles.divider} />
 
         {/* Labels Section */}
-        <TouchableOpacity
-          style={styles.section}
-          onPress={() => navigate(ROUTES.LABELS)}>
+        <TouchableOpacity style={styles.section} onPress={handleEditLabels}>
           <CustomText
             fontFamily={Fonts.Medium}
             fontSize={RFValue(13)}
