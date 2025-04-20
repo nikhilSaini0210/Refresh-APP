@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   Image,
   StyleSheet,
   TouchableOpacity,
@@ -10,17 +9,19 @@ import React, {FC} from 'react';
 import CustomText from './CustomText';
 import {Colors, Fonts, gradientColor} from '@utils/Constants';
 import LinearGradient from 'react-native-linear-gradient';
+import GradientActivityIndicator from '@components/global/GradientActivityIndicator';
 
 interface ButtonProps {
   onPress: () => void;
   title: string;
-  disabled: boolean;
-  loading: boolean;
+  disabled?: boolean;
+  loading?: boolean;
   icon?: any;
   textColor?: string;
   style?: ViewStyle | ViewStyle[];
   iconB?: any;
   gradientColors?: string[];
+  activityGradientColors?: string[];
 }
 
 const MixedButton: FC<ButtonProps> = ({
@@ -33,6 +34,7 @@ const MixedButton: FC<ButtonProps> = ({
   style = {},
   iconB,
   gradientColors = gradientColor,
+  activityGradientColors = gradientColor,
 }) => {
   return (
     <TouchableOpacity
@@ -41,14 +43,14 @@ const MixedButton: FC<ButtonProps> = ({
       style={styles.btnTouch}
       activeOpacity={0.8}>
       <LinearGradient
-        style={[styles.btn]}
+        style={[styles.btn, style]}
         colors={gradientColors}
         start={{x: 1, y: 1}}
         end={{x: 0, y: 1}}>
         {loading ? (
-          <ActivityIndicator color={'#fff'} size="small" />
+          <GradientActivityIndicator size={20} gradientColors={activityGradientColors} />
         ) : (
-          <View style={[styles.buttonContent, style]}>
+          <View style={[styles.buttonContent]}>
             {icon && <Image source={icon} style={styles.icon} />}
             <CustomText
               style={[styles.text, {color: textColor}]}
@@ -67,12 +69,6 @@ const MixedButton: FC<ButtonProps> = ({
 export default MixedButton;
 
 const styles = StyleSheet.create({
-  btn: {
-    justifyContent: 'center',
-    borderRadius: 50,
-    padding: 18,
-    width: '100%',
-  },
   text: {},
   icon: {
     width: 20,
@@ -85,6 +81,11 @@ const styles = StyleSheet.create({
   },
   btnTouch: {
     width: '100%',
-    height: '100%',
+  },
+  btn: {
+    justifyContent: 'center',
+    borderRadius: 50,
+    padding: 18,
+    width: '100%',
   },
 });

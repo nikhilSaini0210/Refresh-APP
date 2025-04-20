@@ -6,13 +6,15 @@ import {
   ScrollView,
   Image,
   Keyboard,
+  Alert,
+  BackHandler,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
 import BackButton from '@components/ui/BackButton';
 import CustomText from '@components/ui/CustomText';
-import {Fonts} from '@utils/Constants';
+import {Colors, Fonts} from '@utils/Constants';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {goBack, navigate, resetAndNavigate} from '@utils/NavigationUtils';
 import {ROUTES} from '@navigation/Routes';
@@ -27,6 +29,7 @@ import {selectFromGallery, takePhoto} from '@service/imagePicker';
 import {uploadToS3} from '@service/uploadToS3';
 import {calculateAge} from '@utils/DateUtils';
 import {CollectionsType} from '@service/config';
+import ImageSelectionModal from '@components/ui/ImageSelectionModal';
 
 const EditProfile = () => {
   const {user} = useAuth();
@@ -36,15 +39,11 @@ const EditProfile = () => {
   const [imageData, setImageData] = useState<Asset | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      setProfileData(user);
-    }
-  }, [user]);
+  const [isCameraTypeSelector, setIsCameraTypeSelector] = useState(false);
 
   const handleImageSelection = async (type: 'camera' | 'gallery') => {
     Keyboard.dismiss();
+    setIsCameraTypeSelector(false);
     try {
       let selectedImage: Asset | null;
 
@@ -110,6 +109,32 @@ const EditProfile = () => {
             };
           });
         }
+        const sw = await AsyncStorage.getItem('user_work');
+        const savedWork = sw != null ? JSON.parse(sw) : profileData?.work;
+        if (savedWork) {
+          setProfileData(prev => {
+            if (!prev) {
+              return null;
+            }
+            return {
+              ...prev,
+              work: savedWork,
+            };
+          });
+        }
+        const se = await AsyncStorage.getItem('user_edu');
+        const savedEdu = se != null ? JSON.parse(se) : profileData?.education;
+        if (savedEdu) {
+          setProfileData(prev => {
+            if (!prev) {
+              return null;
+            }
+            return {
+              ...prev,
+              education: savedEdu,
+            };
+          });
+        }
       }
     } catch (error) {
       console.error('Failed to load profile data:', error);
@@ -151,6 +176,11 @@ const EditProfile = () => {
     } catch (error) {
       console.error('Failed to save profile data:', error);
     } finally {
+      await AsyncStorage.removeItem('user_bio');
+      await AsyncStorage.removeItem('user_name');
+      await AsyncStorage.removeItem('user_hometown');
+      await AsyncStorage.removeItem('user_work');
+      await AsyncStorage.removeItem('user_edu');
       setLoading(false);
     }
   };
@@ -197,12 +227,28 @@ const EditProfile = () => {
     });
   };
 
+  const handleEditEdu = async () => {
+    navigate(ROUTES.ABOUT_EDIT, {
+      initialData: {editData: profileData?.education, editOption: 'Education'},
+    });
+  };
+
   const handleEditGender = async () => {
     setIsGenderSelector(true);
   };
 
   const handleEditBirthday = async () => {
     setIsBirthdaySelector(true);
+  };
+
+  const handleEditWork = async () => {
+    navigate(ROUTES.ABOUT_EDIT, {
+      initialData: {editData: profileData?.work, editOption: 'Work'},
+    });
+  };
+
+  const handleCameraTypeSelction = () => {
+    setIsCameraTypeSelector(true);
   };
 
   const renderSectionWithArrow = (
@@ -229,6 +275,50 @@ const EditProfile = () => {
     </TouchableOpacity>
   );
 
+  const removeData = async () => {
+    await AsyncStorage.removeItem('user_bio');
+    await AsyncStorage.removeItem('user_name');
+    await AsyncStorage.removeItem('user_hometown');
+    await AsyncStorage.removeItem('user_work');
+    await AsyncStorage.removeItem('user_edu');
+    await goBack();
+  };
+
+  useEffect(() => {
+    if (user) {
+      setProfileData(user);
+    }
+  }, [user]);
+
+  const handleBackPress = useCallback(() => {
+    Alert.alert(
+      'Confirm Exit',
+      'Are you sure you want to go back?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => null,
+        },
+        {
+          text: 'OK',
+          onPress: () => removeData(),
+        },
+      ],
+      {cancelable: false},
+    );
+    return true;
+  }, []);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackPress,
+    );
+
+    return () => backHandler.remove();
+  }, [handleBackPress]);
+
   useFocusEffect(
     useCallback(() => {
       loadProfileData();
@@ -237,12 +327,12 @@ const EditProfile = () => {
 
   return (
     <CustomSafeAreaView style={styles.container}>
-      <BackButton />
+      <BackButton handleBackPress={handleBackPress} />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <TouchableOpacity
           style={styles.avtarContainer}
-          onPress={() => handleImageSelection('gallery')}>
+          onPress={handleCameraTypeSelction}>
           <View>
             {image ? (
               <Image source={{uri: image}} style={styles.avatarImage} />
@@ -293,6 +383,22 @@ const EditProfile = () => {
           profileData?.hometown || 'India',
           handleEditHometown,
         )}
+
+        <View style={styles.divider} />
+
+        {renderSectionWithArrow(
+          'Work',
+          profileData?.work || 'Studying',
+          handleEditWork,
+        )}
+
+        <View style={styles.divider} />
+
+        {renderSectionWithArrow(
+          'Education',
+          profileData?.education || '12th',
+          handleEditEdu,
+        )}
         <View style={styles.divider} />
 
         {/* Labels Section */}
@@ -316,6 +422,7 @@ const EditProfile = () => {
           textColor="#FFF"
           onPress={handleSave}
           loading={loading}
+          activityGradientColors={[Colors.primary, Colors.secondary]}
         />
       </View>
       <GenderSelector
@@ -330,6 +437,13 @@ const EditProfile = () => {
         onClose={() => setIsBirthdaySelector(false)}
         onSelect={handleBirthday}
         initialDate={profileData?.dob || '01/01/2001'}
+      />
+
+      <ImageSelectionModal
+        visible={isCameraTypeSelector}
+        onClose={() => setIsCameraTypeSelector(false)}
+        onCamera={() => handleImageSelection('camera')}
+        onGallery={() => handleImageSelection('gallery')}
       />
     </CustomSafeAreaView>
   );
