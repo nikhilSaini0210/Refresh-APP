@@ -329,14 +329,18 @@ const EditProfile = () => {
     return true;
   }, []);
 
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      handleBackPress,
-    );
+  useFocusEffect(
+    useCallback(() => {
+      // Add the back press event listener when the screen is in focus
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        handleBackPress,
+      );
 
-    return () => backHandler.remove();
-  }, [handleBackPress]);
+      // Remove the listener when the screen is out of focus
+      return () => backHandler.remove();
+    }, [handleBackPress]),
+  );
 
   useFocusEffect(
     useCallback(() => {

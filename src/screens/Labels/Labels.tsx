@@ -24,10 +24,14 @@ const Labels: FC = () => {
   const [selectedLabels, setSelectedLabels] = useState<string[]>(
     labelsItem && labelsItem.length > 0 ? labelsItem : [],
   );
-  const [aboutMeLabels, setAboutMeLabels] = useState<string[]>(labels.AboutMe);
-  const [myThingLabels, setMyThingLabels] = useState<string[]>(labels.MyThing);
+  const [aboutMeLabels, setAboutMeLabels] = useState<string[]>(
+    labels.AboutMe.filter(label => !labelsItem.includes(label)),
+  );
+  const [myThingLabels, setMyThingLabels] = useState<string[]>(
+    labels.MyThing.filter(label => !labelsItem.includes(label)),
+  );
   const [inviteMeLabels, setInviyeMeLabels] = useState<string[]>(
-    labels.InviteMe,
+    labels.InviteMe.filter(label => !labelsItem.includes(label)),
   );
 
   const areArraysEqual = (array1: string[], array2: string[]) => {
@@ -87,42 +91,44 @@ const Labels: FC = () => {
     }
   };
 
-  const renderLabel = (label: string, title: string, index: number) => (
-    <TouchableOpacity
-      key={index}
-      style={[
-        styles.label,
-        selectedLabels.includes(label) && labels.AboutMe.includes(label)
-          ? styles.selectedLabel1
-          : selectedLabels.includes(label) && labels.MyThing.includes(label)
-          ? styles.selectedLabel2
-          : selectedLabels.includes(label) && labels.InviteMe.includes(label)
-          ? styles.selectedLabel3
-          : null,
-      ]}
-      onPress={() => handleSelectLabel(label, title)}>
-      <CustomText
-        fontFamily={Fonts.Medium}
-        fontSize={RFValue(10)}
+  const renderLabel = (label: string, title: string, index: number) => {
+    return (
+      <TouchableOpacity
+        key={index}
         style={[
-          selectedLabels.includes(label)
-            ? styles.selectedLabelText
-            : styles.labelText,
-        ]}>
-        {label}
-      </CustomText>
-      {title === 'Selected labels' && (
-        <View style={styles.crossButton}>
-          <CustomText
-            style={styles.cross}
-            fontFamily={Fonts.SemiBold}
-            fontSize={RFValue(8)}>
-            X
-          </CustomText>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
+          styles.label,
+          selectedLabels.includes(label) && labels.AboutMe.includes(label)
+            ? styles.selectedLabel1
+            : selectedLabels.includes(label) && labels.MyThing.includes(label)
+            ? styles.selectedLabel2
+            : selectedLabels.includes(label) && labels.InviteMe.includes(label)
+            ? styles.selectedLabel3
+            : null,
+        ]}
+        onPress={() => handleSelectLabel(label, title)}>
+        <CustomText
+          fontFamily={Fonts.Medium}
+          fontSize={RFValue(10)}
+          style={[
+            selectedLabels.includes(label)
+              ? styles.selectedLabelText
+              : styles.labelText,
+          ]}>
+          {label}
+        </CustomText>
+        {title === 'Selected labels' && (
+          <View style={styles.crossButton}>
+            <CustomText
+              style={styles.cross}
+              fontFamily={Fonts.SemiBold}
+              fontSize={RFValue(8)}>
+              X
+            </CustomText>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   const renderSection = (title: string, data: string[]) => (
     <View key={title} style={styles.section}>
@@ -209,7 +215,7 @@ const styles = StyleSheet.create({
   },
   okButtonCont: {
     width: '20%',
-    height: 35,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
