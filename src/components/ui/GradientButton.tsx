@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   Image,
   StyleSheet,
   TouchableOpacity,
@@ -10,6 +9,7 @@ import React, {FC} from 'react';
 import CustomText from './CustomText';
 import {Colors, Fonts, gradientColor} from '@utils/Constants';
 import LinearGradient from 'react-native-linear-gradient';
+import GradientActivityIndicator from '@components/global/GradientActivityIndicator';
 
 interface ButtonProps {
   onPress: () => void;
@@ -22,6 +22,7 @@ interface ButtonProps {
   iconB?: any;
   btnStyle?: ViewStyle | ViewStyle[];
   gradientColors?: string[];
+  activityGradientColors?: string[];
 }
 
 const GradientButton: FC<ButtonProps> = ({
@@ -35,6 +36,7 @@ const GradientButton: FC<ButtonProps> = ({
   iconB,
   btnStyle,
   gradientColors = gradientColor,
+  activityGradientColors,
 }) => {
   return (
     <TouchableOpacity
@@ -48,7 +50,10 @@ const GradientButton: FC<ButtonProps> = ({
         start={{x: 1, y: 1}}
         end={{x: 0, y: 1}}>
         {loading ? (
-          <ActivityIndicator color={'#fff'} size="small" />
+          <GradientActivityIndicator
+            size={20}
+            gradientColors={activityGradientColors}
+          />
         ) : (
           <View style={[styles.buttonContent, style]}>
             {icon && <Image source={icon} style={styles.icon} />}

@@ -10,6 +10,8 @@ export enum Colors {
   lighBlue = '#E7F3FF',
   pink = '#EE95B5',
   lightPink = '#FFE6F7',
+  gradientPink = '#F3A8CE',
+  gradientOrange = '#F7B174',
 }
 export enum Fonts {
   Regular = 'Okra-Regular',

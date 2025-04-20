@@ -37,6 +37,12 @@ const AboutEdit = () => {
     case 'Name':
       maxLength = 35;
       break;
+    case 'Work':
+      maxLength = 200;
+      break;
+    case 'Education':
+      maxLength = 250;
+      break;
     default:
       maxLength = 28;
       break;
@@ -60,6 +66,18 @@ const AboutEdit = () => {
         const hometown = value.trim();
         if (rd !== hometown) {
           await AsyncStorage.setItem('user_hometown', JSON.stringify(hometown));
+        }
+      }
+      if (aboutHeader === 'Work') {
+        const work = value.trim();
+        if (rd !== work) {
+          await AsyncStorage.setItem('user_work', JSON.stringify(work));
+        }
+      }
+      if (aboutHeader === 'Education') {
+        const edu = value.trim();
+        if (rd !== edu) {
+          await AsyncStorage.setItem('user_edu', JSON.stringify(edu));
         }
       }
       goBack();
