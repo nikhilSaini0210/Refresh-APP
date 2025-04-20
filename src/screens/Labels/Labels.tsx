@@ -91,18 +91,25 @@ const Labels = () => {
   const renderSection = (title: string, data: string[]) => (
     <View key={title} style={styles.section}>
       {title === 'Selected labels' ? (
-        <Text style={styles.sectionTitle}>
+        <CustomText
+          fontFamily={Fonts.Medium}
+          fontSize={RFValue(14)}
+          style={styles.sectionTitle}>
           Selected labels ({selectedLabels.length}/{maxLabels})
-        </Text>
+        </CustomText>
       ) : (
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <CustomText
+          fontFamily={Fonts.Medium}
+          fontSize={RFValue(14)}
+          style={styles.sectionTitle}>
+          {title}
+        </CustomText>
       )}
 
       <FlatList
         data={data}
         renderItem={({item}) => renderLabel(item, title)}
         keyExtractor={item => item}
-        // numColumns={3}
         scrollEnabled={false}
         contentContainerStyle={styles.labelsContainer}
       />
@@ -183,8 +190,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
     marginBottom: 8,
   },
   labelsContainer: {
