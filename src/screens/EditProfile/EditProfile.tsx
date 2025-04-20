@@ -329,7 +329,9 @@ const EditProfile = () => {
     <CustomSafeAreaView style={styles.container}>
       <BackButton handleBackPress={handleBackPress} />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollView}>
         <TouchableOpacity
           style={styles.avtarContainer}
           onPress={handleCameraTypeSelction}>
@@ -464,6 +466,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     justifyContent: 'center',
+  },
+  scrollView: {
+    paddingBottom: 100,
   },
   section: {
     flexDirection: 'row',
