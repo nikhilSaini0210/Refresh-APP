@@ -6,10 +6,12 @@ import {
   CameraOptions,
   ImageLibraryOptions,
 } from 'react-native-image-picker';
-import {Platform, PermissionsAndroid} from 'react-native';
+import {Platform, PermissionsAndroid, Alert} from 'react-native';
+
+const MAX_VIDEO_DURATION = 60;
 
 const imagePickerOptions: CameraOptions & ImageLibraryOptions = {
-  mediaType: 'photo' as const,
+  mediaType: 'mixed',
   includeBase64: false,
   maxHeight: 800,
   maxWidth: 800,
@@ -77,6 +79,20 @@ const requestStoragePermission = async (): Promise<boolean> => {
   }
 };
 
+const checkVideoDuration = (asset: Asset): boolean => {
+  if (asset.type && asset.type.startsWith('video')) {
+    const duration = asset.duration || 0;
+    if (duration > MAX_VIDEO_DURATION) {
+      Alert.alert(
+        'Error',
+        `Video duration should not exceed ${MAX_VIDEO_DURATION} seconds.`,
+      );
+      return false;
+    }
+  }
+  return true;
+};
+
 export const takePhoto = async (): Promise<Asset | null> => {
   // Request camera permission first
   const hasPermission = await requestCameraPermission();
@@ -94,7 +110,12 @@ export const takePhoto = async (): Promise<Asset | null> => {
         console.error('Camera error:', response.errorMessage);
         resolve(null);
       } else if (response.assets && response.assets.length > 0) {
-        resolve(response.assets[0]);
+        const selectedAsset = response.assets[0];
+        if (selectedAsset.type?.startsWith('video') && !checkVideoDuration(selectedAsset)) {
+          resolve(null);
+        } else {
+          resolve(selectedAsset);
+        }
       } else {
         resolve(null);
       }
@@ -118,7 +139,15 @@ export const selectFromGallery = async (): Promise<Asset | null> => {
         console.error('ImagePicker Error:', response.errorMessage);
         resolve(null);
       } else if (response.assets && response.assets.length > 0) {
-        resolve(response.assets[0]);
+        const selectedAsset = response.assets[0];
+        if (
+          selectedAsset.type?.startsWith('video') &&
+          !checkVideoDuration(selectedAsset)
+        ) {
+          resolve(null);
+        } else {
+          resolve(selectedAsset);
+        }
       } else {
         resolve(null);
       }

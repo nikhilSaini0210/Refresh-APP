@@ -32,6 +32,7 @@ export interface Comment {
 
 export interface Post {
   id: string;
+  isVideo: boolean;
   imageUrl: string;
   caption: string;
   userName: string;
@@ -52,6 +53,7 @@ class PostService {
     userName: string,
     userEmail: string,
     userId: string,
+    isVideo: boolean,
   ): Promise<Post> {
     try {
       // Upload image to S3
@@ -77,6 +79,7 @@ class PostService {
         updatedAt: serverTimestamp(),
         comments: [],
         likes: [],
+        isVideo: isVideo,
       };
 
       await setDoc(newPostRef, postData);
