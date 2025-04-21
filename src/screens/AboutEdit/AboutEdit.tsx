@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, FC} from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ type AboutEditRouteParams = {
   };
 };
 
-const AboutEdit = () => {
+const AboutEdit: FC = () => {
   const route = useRoute<RouteProp<AboutEditRouteParams, 'params'>>();
   const {initialData} = route.params;
   const rd = initialData?.editData ?? '';

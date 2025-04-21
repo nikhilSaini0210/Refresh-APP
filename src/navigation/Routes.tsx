@@ -11,6 +11,7 @@ export enum ROUTES {
   IMAGEVIEWER = '/imageviewer',
   PROFILEVISIT = '/profilevisit',
   POST_DETAIL = '/post_detail',
+  VIDEO_POST_DETAIL = 'video_post_detail',
   ABOUT_EDIT = '/about_edit',
   EDIT_PROFILE = '/edit_profile',
   LABELS = '/labels',

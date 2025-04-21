@@ -24,6 +24,7 @@ import {Gender, TabType} from './types';
 import {customUser, tabs} from '@utils/DummyData';
 import About from '@components/Profile/About';
 import GenderAge from '@components/Profile/GenderAge';
+import VideoGrid from '@components/Profile/VideoGrid';
 
 const Profile: FC = () => {
   const {signOut, user, setIsUpdateUser} = useAuth();
@@ -62,8 +63,12 @@ const Profile: FC = () => {
     navigate(ROUTES.FOLLOWERLIST);
   };
 
-  const handlePhotoPress = (post: Post) => {
+  const handlePhotoPress = async (post: Post) => {
     navigate(ROUTES.POST_DETAIL, {postData: {post, userInfo: user}});
+  };
+
+  const handleVideoPress = async (post: Post) => {
+    navigate(ROUTES.VIDEO_POST_DETAIL, {postData: {post, userInfo: user}});
   };
 
   const renderTabContent = () => {
@@ -74,11 +79,11 @@ const Profile: FC = () => {
         return <About about={user || customUser} />;
       case 'Video':
         return (
-          <View style={styles.emptyStateContainer}>
-            <IIcon name="videocam-outline" size={48} color="#ccc" />
-            <Text style={styles.emptyStateText}>No videos yet</Text>
-          </View>
-          // <VideoGrid posts={userPosts} />
+          //   <View style={styles.emptyStateContainer}>
+          //   <IIcon name="videocam-outline" size={48} color="#ccc" />
+          //   <Text style={styles.emptyStateText}>No videos yet</Text>
+          // </View>
+          <VideoGrid posts={userPosts} onPressVideo={handleVideoPress} />
         );
       case 'Favorite':
         return (

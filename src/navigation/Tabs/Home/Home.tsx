@@ -142,38 +142,43 @@ const Home: FC<Props> = ({onPressTab}) => {
           const postUser = postUserData?.find(u => u.id === item.userId);
           return (
             <View style={styles.imageContainer}>
-              <TouchableOpacity
-                onPress={() => onPressProfileImage(postUser)}
-                style={styles.userContent}>
-                {postUser && postUser?.photoURL ? (
-                  <Image
-                    style={styles.userImage}
-                    source={{uri: postUser?.photoURL}}
-                  />
-                ) : (
-                  <Image
-                    style={styles.userImage}
-                    source={require('@assets/images/user.png')}
-                  />
-                )}
-                {postUser && postUser?.displayName && (
-                  <View style={styles.userInfo}>
-                    <CustomText
-                      fontSize={RFValue(16)}
-                      fontFamily={Fonts.Medium}>
-                      {postUser?.displayName}
-                    </CustomText>
-                    <CustomText
-                      fontSize={RFValue(12)}
-                      fontFamily={Fonts.Regular}
-                      style={styles.timeText}>
-                      {item?.createdAt
-                        ? formatFirestoreTimestamp(item.createdAt)
-                        : 'recently'}
-                    </CustomText>
-                  </View>
-                )}
-              </TouchableOpacity>
+              <View style={styles.imageHeader}>
+                <TouchableOpacity
+                  onPress={() => onPressProfileImage(postUser)}
+                  style={styles.userContent}>
+                  {postUser && postUser?.photoURL ? (
+                    <Image
+                      style={styles.userImage}
+                      source={{uri: postUser?.photoURL}}
+                    />
+                  ) : (
+                    <Image
+                      style={styles.userImage}
+                      source={require('@assets/images/user.png')}
+                    />
+                  )}
+                  {postUser && postUser?.displayName && (
+                    <View style={styles.userInfo}>
+                      <CustomText
+                        fontSize={RFValue(16)}
+                        fontFamily={Fonts.Medium}>
+                        {postUser?.displayName}
+                      </CustomText>
+                      <CustomText
+                        fontSize={RFValue(12)}
+                        fontFamily={Fonts.Regular}
+                        style={styles.timeText}>
+                        {item?.createdAt
+                          ? formatFirestoreTimestamp(item.createdAt)
+                          : 'recently'}
+                      </CustomText>
+                    </View>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <MIcon name="dots-vertical" color={'#000'} size={20} />
+                </TouchableOpacity>
+              </View>
               <CustomText
                 style={styles.caption}
                 fontFamily={Fonts.Medium}
@@ -248,8 +253,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  imageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 15,
+  },
   imageContainer: {
-    width: screenWidth * 0.9,
+    width: screenWidth,
     alignSelf: 'center',
     backgroundColor: '#FFF',
     marginTop: 16,
@@ -270,7 +281,6 @@ const styles = StyleSheet.create({
   userImage: {
     width: 40,
     height: 40,
-    marginLeft: 15,
     borderRadius: 50,
   },
   userName: {

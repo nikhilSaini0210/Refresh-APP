@@ -17,6 +17,19 @@ const imagePickerOptions: CameraOptions & ImageLibraryOptions = {
   maxWidth: 800,
   quality: 0.8,
   saveToPhotos: false,
+  videoQuality: 'high',
+  durationLimit: MAX_VIDEO_DURATION,
+};
+
+const videoOptions: CameraOptions = {
+  mediaType: 'video',
+  videoQuality: 'high',
+  includeBase64: false,
+  maxHeight: 800,
+  maxWidth: 800,
+  quality: 0.8,
+  durationLimit: MAX_VIDEO_DURATION,
+  saveToPhotos: false,
 };
 
 const requestCameraPermission = async (): Promise<boolean> => {
@@ -102,25 +115,51 @@ export const takePhoto = async (): Promise<Asset | null> => {
   }
 
   return new Promise(resolve => {
-    launchCamera(imagePickerOptions, (response: ImagePickerResponse) => {
-      if (response.didCancel) {
-        console.log('User cancelled camera');
-        resolve(null);
-      } else if (response.errorCode) {
-        console.error('Camera error:', response.errorMessage);
-        resolve(null);
-      } else if (response.assets && response.assets.length > 0) {
-        const selectedAsset = response.assets[0];
-        if (selectedAsset.type?.startsWith('video') && !checkVideoDuration(selectedAsset)) {
-          resolve(null);
-        } else {
-          resolve(selectedAsset);
-        }
-      } else {
-        resolve(null);
-      }
-    });
+    Alert.alert(
+      'Choose Media Type',
+      'What would you like to capture?',
+      [
+        {
+          text: 'Photo',
+          onPress: () => {
+            launchCamera(
+              imagePickerOptions,
+              (response: ImagePickerResponse) => {
+                handleResponse(response, resolve);
+              },
+            );
+          },
+        },
+        {
+          text: 'Video',
+          onPress: () => {
+            launchCamera(videoOptions, (response: ImagePickerResponse) => {
+              handleResponse(response, resolve);
+            });
+          },
+        },
+        {text: 'Cancel', onPress: () => resolve(null), style: 'cancel'},
+      ],
+      {cancelable: true},
+    );
   });
+};
+
+const handleResponse = (
+  response: ImagePickerResponse,
+  resolve: (value: Asset | null) => void,
+) => {
+  if (response.didCancel) {
+    console.log('User cancelled capture');
+    resolve(null);
+  } else if (response.errorCode) {
+    console.error('Camera Error:', response.errorMessage);
+    resolve(null);
+  } else if (response.assets && response.assets.length > 0) {
+    resolve(response.assets[0]);
+  } else {
+    resolve(null);
+  }
 };
 
 export const selectFromGallery = async (): Promise<Asset | null> => {

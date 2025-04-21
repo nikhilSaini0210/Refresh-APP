@@ -1,6 +1,6 @@
 import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
 import {TabButtons} from '@utils/DummyData';
-import React, {useState} from 'react';
+import React, {FC, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import TabButton from './TabButton';
 import Home from '@navigation/Tabs/Home/Home';
@@ -19,7 +19,7 @@ type HomeScreenRouteParams = {
   };
 };
 
-const HomeScreen = () => {
+const HomeScreen: FC = () => {
   const route = useRoute<RouteProp<HomeScreenRouteParams, 'params'>>();
   const rt = route?.params;
   const tab = rt ? rt.item.tab : 0;

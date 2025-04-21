@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useEffect, FC} from 'react';
 import {
   View,
   StyleSheet,
@@ -31,7 +31,7 @@ import {calculateAge} from '@utils/DateUtils';
 import {CollectionsType} from '@service/config';
 import ImageSelectionModal from '@components/ui/ImageSelectionModal';
 
-const EditProfile = () => {
+const EditProfile: FC = () => {
   const {user} = useAuth();
   const [profileData, setProfileData] = useState<UserData | null>(null);
   const [isGenderSelector, setIsGenderSelector] = useState(false);
