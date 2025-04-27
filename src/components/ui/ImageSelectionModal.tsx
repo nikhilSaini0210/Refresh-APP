@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
     padding: 20,
     width: '100%',
     alignItems: 'center',

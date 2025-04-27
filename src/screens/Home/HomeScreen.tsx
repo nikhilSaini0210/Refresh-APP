@@ -12,6 +12,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import {gradientColor} from '@utils/Constants';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import useKeyboardVisibilityListener from '@utils/useKeyboardVisibilityListener';
+import {Post} from '@service/post.service';
+import DetailsModal from '@components/Home/DetailsModel';
 
 type HomeScreenRouteParams = {
   params: {
@@ -25,16 +27,43 @@ const HomeScreen: FC = () => {
   const tab = rt ? rt.item.tab : 0;
   const [selectedTab, setSelectedTab] = useState(tab);
   const isKeyboardVisible = useKeyboardVisibilityListener();
+  const [isDetailsModalVisible, setDetailsModalVisible] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   const onSelectTab = (t: any) => {
     setSelectedTab(t);
+  };
+
+  const onPressDetails = (post: Post) => {
+    setSelectedPost(post);
+    setDetailsModalVisible(true);
+  };
+
+  const handleAddToFavorites = () => {
+    // Logic for adding to favorites
+    setDetailsModalVisible(false);
+  };
+
+  const handleShare = () => {
+    // Logic for sharing the post
+    setDetailsModalVisible(false);
+  };
+
+  const handleDeletePost = () => {
+    // Logic for deleting the post
+    setDetailsModalVisible(false);
+  };
+
+  const handleViewAccount = () => {
+    // Logic for viewing account details
+    setDetailsModalVisible(false);
   };
 
   return (
     <CustomSafeAreaView>
       <View style={styles.container}>
         {selectedTab === 0 ? (
-          <Home onPressTab={onSelectTab} />
+          <Home onPressTab={onSelectTab} onPressDetails={onPressDetails} />
         ) : selectedTab === 1 ? (
           <Search />
         ) : selectedTab === 2 ? (
@@ -44,7 +73,8 @@ const HomeScreen: FC = () => {
         ) : (
           <Profile />
         )}
-        {!isKeyboardVisible && (
+        {/* Conditionally render the TabBar */}
+        {!isKeyboardVisible && !isDetailsModalVisible && (
           <LinearGradient
             colors={gradientColor}
             start={{x: 1, y: 1}}
@@ -60,6 +90,14 @@ const HomeScreen: FC = () => {
             ))}
           </LinearGradient>
         )}
+        <DetailsModal
+          visible={isDetailsModalVisible}
+          onClose={() => setDetailsModalVisible(false)}
+          onAddToFavorites={handleAddToFavorites}
+          onShare={handleShare}
+          onDeletePost={handleDeletePost}
+          onViewAccount={handleViewAccount}
+        />
       </View>
     </CustomSafeAreaView>
   );

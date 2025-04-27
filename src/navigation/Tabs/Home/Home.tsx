@@ -27,9 +27,10 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface Props {
   onPressTab: (tab: any) => void;
+  onPressDetails: (post: Post) => void;
 }
 
-const Home: FC<Props> = ({onPressTab}) => {
+const Home: FC<Props> = ({onPressTab, onPressDetails}) => {
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState<Post[] | []>([]);
   const {user} = useAuth();
@@ -175,7 +176,7 @@ const Home: FC<Props> = ({onPressTab}) => {
                     </View>
                   )}
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => onPressDetails(item)}>
                   <MIcon name="dots-vertical" color={'#000'} size={20} />
                 </TouchableOpacity>
               </View>
@@ -264,7 +265,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#FFF',
     marginTop: 16,
-    borderRadius: 8,
     overflow: 'hidden',
   },
   image: {
