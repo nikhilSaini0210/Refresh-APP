@@ -19,18 +19,20 @@ interface Props {
 const PhotoGrid: FC<Props> = ({posts, onPressPhoto}) => {
   return (
     <View style={styles.photoGrid}>
-      {posts.map(post => (
-        <TouchableOpacity
-          key={post.id}
-          style={styles.photoItem}
-          onPress={() => onPressPhoto?.(post)}>
-          <Image
-            source={{uri: post.imageUrl}}
-            style={styles.photoImage}
-            resizeMode="cover"
-          />
-        </TouchableOpacity>
-      ))}
+      {posts.map(post =>
+        post?.isVideo ? null : (
+          <TouchableOpacity
+            key={post.id}
+            style={styles.photoItem}
+            onPress={() => onPressPhoto?.(post)}>
+            <Image
+              source={{uri: post.imageUrl}}
+              style={styles.photoImage}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
+        ),
+      )}
     </View>
   );
 };

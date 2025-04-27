@@ -1,38 +1,35 @@
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {FC} from 'react';
 import {Post} from '@service/post.service';
+import Video from 'react-native-video';
+import {screenWidth} from '@utils/Scaling';
 
-const width = Dimensions.get('window').width;
-const ITEMWIDTH = width / 2 - 4;
+const ITEMWIDTH = screenWidth / 2 - 4;
 
 interface Props {
   posts: Post[];
+  onPressVideo?: (post: Post) => void;
 }
 
-const VideoGrid: FC<Props> = ({posts}) => {
+const VideoGrid: FC<Props> = ({posts, onPressVideo}) => {
   return (
     <View style={styles.photoGrid}>
-      {posts.map(post => (
-        <TouchableOpacity
-          key={post.id}
-          style={styles.photoItem}
-          onPress={() => {
-            // Handle photo tap
-            console.log('Photo tapped:', post.id);
-          }}>
-          <Image
-            source={{uri: post.imageUrl}}
-            style={styles.photoImage}
-            resizeMode="cover"
-          />
-        </TouchableOpacity>
-      ))}
+      {posts.map(post =>
+        post?.isVideo ? (
+          <TouchableOpacity
+            key={post.id}
+            style={styles.photoItem}
+            onPress={() => onPressVideo?.(post)}>
+            <Video
+              source={{uri: post.imageUrl}}
+              style={styles.photoImage}
+              resizeMode="cover"
+              paused={true}
+              muted={true}
+            />
+          </TouchableOpacity>
+        ) : null,
+      )}
     </View>
   );
 };
@@ -54,7 +51,5 @@ const styles = StyleSheet.create({
   photoImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
   },
 });

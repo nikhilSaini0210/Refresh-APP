@@ -2,6 +2,7 @@ import {
   Alert,
   FlatList,
   Image,
+  RefreshControl,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -20,6 +21,9 @@ import {useFocusEffect} from '@react-navigation/native';
 import authService, {UserData} from '@service/auth.service';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {formatFirestoreTimestamp} from '@utils/DateUtils';
+import RefreshMediaFeed from '@components/Posts/RefreshMediaFeed';
+import {screenHeight, screenWidth} from '@utils/Scaling';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface Props {
   onPressTab: (tab: any) => void;
@@ -30,6 +34,8 @@ const Home: FC<Props> = ({onPressTab}) => {
   const [posts, setPosts] = useState<Post[] | []>([]);
   const {user} = useAuth();
   const [postUserData, setPostUserData] = useState<UserData[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
   const onPressProfileImage = (postUser: UserData | undefined) => {
     if (postUser && user) {
@@ -46,7 +52,6 @@ const Home: FC<Props> = ({onPressTab}) => {
   };
 
   const getAllPosts = async () => {
-    setLoading(true);
     try {
       const res = await postService.getAllPosts();
       setPosts(res);
@@ -54,6 +59,7 @@ const Home: FC<Props> = ({onPressTab}) => {
       console.log('Error fetching posts:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -97,8 +103,21 @@ const Home: FC<Props> = ({onPressTab}) => {
     }
   };
 
+  const handleViewableChange = ({viewableItems}: {viewableItems: any}) => {
+    if (viewableItems.length > 0) {
+      setCurrentIndex(viewableItems[0].index);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(false);
+    await getAllPosts();
+    await getPostUseerData();
+  };
+
   useFocusEffect(
     useCallback(() => {
+      setLoading(true);
       getAllPosts();
       getPostUseerData();
     }, []),
@@ -110,55 +129,71 @@ const Home: FC<Props> = ({onPressTab}) => {
       <FlatList
         showsVerticalScrollIndicator={false}
         data={posts}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         keyExtractor={item => item.id.toString()}
+        onViewableItemsChanged={handleViewableChange}
+        viewabilityConfig={{viewAreaCoveragePercentThreshold: 80}}
         contentContainerStyle={
           posts.length === 0 ? styles.flatListContainer : styles.flistContent
         }
-        renderItem={({item}) => {
+        renderItem={({item, index}) => {
           const postUser = postUserData?.find(u => u.id === item.userId);
           return (
             <View style={styles.imageContainer}>
-              <TouchableOpacity
-                onPress={() => onPressProfileImage(postUser)}
-                style={styles.userContent}>
-                {postUser && postUser?.photoURL ? (
-                  <Image
-                    style={styles.userImage}
-                    source={{uri: postUser?.photoURL}}
-                  />
-                ) : (
-                  <Image
-                    style={styles.userImage}
-                    source={require('@assets/images/user.png')}
-                  />
-                )}
-                {postUser && postUser?.displayName && (
-                  <View style={styles.userInfo}>
-                    <CustomText
-                      fontSize={RFValue(16)}
-                      fontFamily={Fonts.Medium}>
-                      {postUser?.displayName}
-                    </CustomText>
-                    <CustomText
-                      fontSize={RFValue(12)}
-                      fontFamily={Fonts.Regular}
-                      style={styles.timeText}>
-                      {item?.createdAt
-                        ? formatFirestoreTimestamp(item.createdAt)
-                        : 'recently'}
-                    </CustomText>
-                  </View>
-                )}
-              </TouchableOpacity>
+              <View style={styles.imageHeader}>
+                <TouchableOpacity
+                  onPress={() => onPressProfileImage(postUser)}
+                  style={styles.userContent}>
+                  {postUser && postUser?.photoURL ? (
+                    <Image
+                      style={styles.userImage}
+                      source={{uri: postUser?.photoURL}}
+                    />
+                  ) : (
+                    <Image
+                      style={styles.userImage}
+                      source={require('@assets/images/user.png')}
+                    />
+                  )}
+                  {postUser && postUser?.displayName && (
+                    <View style={styles.userInfo}>
+                      <CustomText
+                        fontSize={RFValue(16)}
+                        fontFamily={Fonts.Medium}>
+                        {postUser?.displayName}
+                      </CustomText>
+                      <CustomText
+                        fontSize={RFValue(12)}
+                        fontFamily={Fonts.Regular}
+                        style={styles.timeText}>
+                        {item?.createdAt
+                          ? formatFirestoreTimestamp(item.createdAt)
+                          : 'recently'}
+                      </CustomText>
+                    </View>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <MIcon name="dots-vertical" color={'#000'} size={20} />
+                </TouchableOpacity>
+              </View>
               <CustomText
                 style={styles.caption}
                 fontFamily={Fonts.Medium}
                 fontSize={RFValue(14)}>
                 {item?.caption}
               </CustomText>
-              <View>
+              {item?.isVideo ? (
+                <RefreshMediaFeed
+                  index={index}
+                  item={item}
+                  currentIndex={currentIndex}
+                />
+              ) : (
                 <Image source={{uri: item?.imageUrl}} style={styles.image} />
-              </View>
+              )}
               <View style={styles.lcContainer}>
                 <TouchableOpacity
                   onPress={() => onLike(item)}
@@ -179,6 +214,9 @@ const Home: FC<Props> = ({onPressTab}) => {
                   <CustomText style={styles.actionText}>
                     {item.comments?.length || 0}
                   </CustomText>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton}>
+                  <MIcon name="share-outline" size={24} color="#333" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -208,26 +246,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   flistContent: {
-    paddingBottom: 100,
+    paddingBottom: 80,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  imageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 15,
+  },
   imageContainer: {
-    width: '90%',
+    width: screenWidth,
     alignSelf: 'center',
     backgroundColor: '#FFF',
-    marginVertical: 10,
+    marginTop: 16,
     borderRadius: 8,
     overflow: 'hidden',
   },
   image: {
-    width: '90%',
-    height: 400,
+    width: '100%',
+    height: screenHeight * 0.6,
     alignSelf: 'center',
-    borderRadius: 10,
     marginBottom: 20,
   },
   userContent: {
@@ -238,7 +281,6 @@ const styles = StyleSheet.create({
   userImage: {
     width: 40,
     height: 40,
-    marginLeft: 15,
     borderRadius: 50,
   },
   userName: {

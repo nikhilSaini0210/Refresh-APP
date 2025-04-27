@@ -1,6 +1,6 @@
 import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
 import {TabButtons} from '@utils/DummyData';
-import React, {useState} from 'react';
+import React, {FC, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import TabButton from './TabButton';
 import Home from '@navigation/Tabs/Home/Home';
@@ -11,6 +11,7 @@ import Profile from '@navigation/Tabs/Profile/Profile';
 import LinearGradient from 'react-native-linear-gradient';
 import {gradientColor} from '@utils/Constants';
 import {RouteProp, useRoute} from '@react-navigation/native';
+import useKeyboardVisibilityListener from '@utils/useKeyboardVisibilityListener';
 
 type HomeScreenRouteParams = {
   params: {
@@ -18,11 +19,12 @@ type HomeScreenRouteParams = {
   };
 };
 
-const HomeScreen = () => {
+const HomeScreen: FC = () => {
   const route = useRoute<RouteProp<HomeScreenRouteParams, 'params'>>();
   const rt = route?.params;
   const tab = rt ? rt.item.tab : 0;
   const [selectedTab, setSelectedTab] = useState(tab);
+  const isKeyboardVisible = useKeyboardVisibilityListener();
 
   const onSelectTab = (t: any) => {
     setSelectedTab(t);
@@ -42,20 +44,22 @@ const HomeScreen = () => {
         ) : (
           <Profile />
         )}
-        <LinearGradient
-          colors={gradientColor}
-          start={{x: 1, y: 1}}
-          end={{x: 0, y: 1}}
-          style={styles.bottomContainer}>
-          {TabButtons.map(item => (
-            <TabButton
-              onPress={() => setSelectedTab(item._id)}
-              item={item}
-              key={item._id}
-              selectedTab={selectedTab}
-            />
-          ))}
-        </LinearGradient>
+        {!isKeyboardVisible && (
+          <LinearGradient
+            colors={gradientColor}
+            start={{x: 1, y: 1}}
+            end={{x: 0, y: 1}}
+            style={styles.bottomContainer}>
+            {TabButtons.map(item => (
+              <TabButton
+                onPress={() => setSelectedTab(item._id)}
+                item={item}
+                key={item._id}
+                selectedTab={selectedTab}
+              />
+            ))}
+          </LinearGradient>
+        )}
       </View>
     </CustomSafeAreaView>
   );

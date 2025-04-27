@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, FC} from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ type AboutEditRouteParams = {
   };
 };
 
-const AboutEdit = () => {
+const AboutEdit: FC = () => {
   const route = useRoute<RouteProp<AboutEditRouteParams, 'params'>>();
   const {initialData} = route.params;
   const rd = initialData?.editData ?? '';
@@ -107,7 +107,11 @@ const AboutEdit = () => {
             <Text style={styles.headerTitle}>{aboutHeader}</Text>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Icon name="checkmark" size={28} color="#00BFA5" />
+              <Icon
+                name="checkmark"
+                size={28}
+                color={value.length > 0 ? '#00BFA5' : '#00000'}
+              />
             </TouchableOpacity>
           </View>
 

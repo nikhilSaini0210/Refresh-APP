@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import 'firebase/firestore';
 import {useRoute} from '@react-navigation/native';
 import postService, {Comment, Post} from '@service/post.service';
@@ -22,7 +22,7 @@ import DisplayComments from './DisplayComments';
 import ActivityLoaderModal from '@components/global/ActivityLoaderModal';
 import authService, {UserData} from '@service/auth.service';
 
-const Comments = () => {
+const Comments: FC = () => {
   const route = useRoute();
   const params = route.params as {postData: Post} | undefined;
   const postData = params?.postData;

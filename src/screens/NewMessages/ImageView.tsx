@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { FC } from 'react';
 import CustomSafeAreaView from '@components/global/CustomSafeAreaView';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {goBack} from '@utils/NavigationUtils';
@@ -19,7 +19,7 @@ interface RouteParams extends Record<string, object | undefined> {
 
 const {width, height} = Dimensions.get('window');
 
-const ImageView = () => {
+const ImageView: FC = () => {
   const route = useRoute<RouteProp<RouteParams, 'params'>>();
   const {item} = route.params;
 

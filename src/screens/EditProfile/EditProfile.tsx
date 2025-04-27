@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useEffect, FC} from 'react';
 import {
   View,
   StyleSheet,
@@ -31,7 +31,7 @@ import {calculateAge} from '@utils/DateUtils';
 import {CollectionsType} from '@service/config';
 import ImageSelectionModal from '@components/ui/ImageSelectionModal';
 
-const EditProfile = () => {
+const EditProfile: FC = () => {
   const {user} = useAuth();
   const [profileData, setProfileData] = useState<UserData | null>(null);
   const [isGenderSelector, setIsGenderSelector] = useState(false);
@@ -135,6 +135,19 @@ const EditProfile = () => {
             };
           });
         }
+        const sl = await AsyncStorage.getItem('user_labels');
+        const savedLabels = sl != null ? JSON.parse(sl) : profileData?.labels;
+        if (savedLabels) {
+          setProfileData(prev => {
+            if (!prev) {
+              return null;
+            }
+            return {
+              ...prev,
+              labels: savedLabels,
+            };
+          });
+        }
       }
     } catch (error) {
       console.error('Failed to load profile data:', error);
@@ -181,6 +194,7 @@ const EditProfile = () => {
       await AsyncStorage.removeItem('user_hometown');
       await AsyncStorage.removeItem('user_work');
       await AsyncStorage.removeItem('user_edu');
+      await AsyncStorage.removeItem('user_labels');
       setLoading(false);
     }
   };
@@ -251,6 +265,10 @@ const EditProfile = () => {
     setIsCameraTypeSelector(true);
   };
 
+  const handleEditLabels = async () => {
+    navigate(ROUTES.LABELS, {labelsItem: profileData?.labels});
+  };
+
   const renderSectionWithArrow = (
     title: string,
     value: string,
@@ -281,6 +299,7 @@ const EditProfile = () => {
     await AsyncStorage.removeItem('user_hometown');
     await AsyncStorage.removeItem('user_work');
     await AsyncStorage.removeItem('user_edu');
+    await AsyncStorage.removeItem('user_labels');
     await goBack();
   };
 
@@ -310,14 +329,18 @@ const EditProfile = () => {
     return true;
   }, []);
 
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      handleBackPress,
-    );
+  useFocusEffect(
+    useCallback(() => {
+      // Add the back press event listener when the screen is in focus
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        handleBackPress,
+      );
 
-    return () => backHandler.remove();
-  }, [handleBackPress]);
+      // Remove the listener when the screen is out of focus
+      return () => backHandler.remove();
+    }, [handleBackPress]),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -404,9 +427,7 @@ const EditProfile = () => {
         <View style={styles.divider} />
 
         {/* Labels Section */}
-        <TouchableOpacity
-          style={styles.section}
-          onPress={() => navigate(ROUTES.LABELS)}>
+        <TouchableOpacity style={styles.section} onPress={handleEditLabels}>
           <CustomText
             fontFamily={Fonts.Medium}
             fontSize={RFValue(13)}

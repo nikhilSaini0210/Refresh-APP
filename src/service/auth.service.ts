@@ -36,6 +36,7 @@ export interface UserData {
   work?: string;
   education?: string;
   hometown?: string;
+  labels?: string[];
 }
 
 interface TokenData {
@@ -127,6 +128,7 @@ class AuthService {
             work: '',
             education: '',
             hometown: '',
+            labels: [],
           };
           if (userData.id) {
             await this.storeUserData(userData as UserData);
@@ -233,6 +235,7 @@ class AuthService {
               work: '',
               education: '',
               hometown: '',
+              labels: [],
             };
 
             await this.storeUserData(userData as UserData);

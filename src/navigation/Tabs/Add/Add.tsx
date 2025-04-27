@@ -15,23 +15,35 @@ const Add: FC = () => {
   const [imageData, setImageData] = useState<Asset | null>(null);
   const [loading, setLoading] = useState(false);
   const [caption, setCaption] = useState('');
+  const [videoUri, setVideoUri] = useState<string | null>(null);
+  const [videoData, setVideoData] = useState<Asset | null>(null);
   const {user} = useAuth();
 
   const handleImageSelection = async (type: 'camera' | 'gallery') => {
     Keyboard.dismiss();
     setLoading(true);
+    setImage(null);
+    setImageData(null);
+    setVideoUri(null);
+    setVideoData(null);
     try {
-      let selectedImage: Asset | null;
+      let selectedMedia: Asset | null;
 
       if (type === 'camera') {
-        selectedImage = await takePhoto();
+        selectedMedia = await takePhoto();
       } else {
-        selectedImage = await selectFromGallery();
+        selectedMedia = await selectFromGallery();
       }
 
-      if (selectedImage && selectedImage.uri) {
-        setImage(selectedImage.uri);
-        setImageData(selectedImage);
+      const isVideo = selectedMedia?.type?.startsWith('video');
+      if (selectedMedia && selectedMedia.uri) {
+        if (isVideo) {
+          setVideoUri(selectedMedia?.uri);
+          setVideoData(selectedMedia);
+        } else {
+          setImage(selectedMedia.uri);
+          setImageData(selectedMedia);
+        }
       }
     } catch (error) {
       console.error('Error selecting image:', error);
@@ -44,13 +56,30 @@ const Add: FC = () => {
     Keyboard.dismiss();
     setLoading(true);
     try {
-      if (imageData) {
+      if (videoData) {
+        const isVideo = true;
+        await postService.createPost(
+          videoData,
+          caption,
+          user?.displayName || '',
+          user?.email || '',
+          user?.id || '',
+          isVideo,
+        );
+
+        Alert.alert('Success', 'Post Successfully Added.');
+        setCaption('');
+        setVideoUri(null);
+        setVideoUri(null);
+      } else if (imageData) {
+        const isVideo = false;
         await postService.createPost(
           imageData,
           caption,
           user?.displayName || '',
           user?.email || '',
           user?.id || '',
+          isVideo,
         );
 
         Alert.alert('Success', 'Post Successfully Added.');
@@ -58,7 +87,7 @@ const Add: FC = () => {
         setImage(null);
         setImageData(null);
       } else {
-        console.error('Invalid image data for upload');
+        console.error('Invalid media data for upload');
       }
     } catch (error) {
       console.error(error);
@@ -78,7 +107,7 @@ const Add: FC = () => {
         />
         <View style={styles.uploadCont}>
           <UploadImageView
-            imageData={image}
+            imageData={videoUri ? videoUri : image}
             onChangeText={setCaption}
             value={caption}
           />
